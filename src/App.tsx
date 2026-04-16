@@ -1,5 +1,39 @@
+import { Routes, Route } from "react-router-dom"
+
+// Pages
 import MapView from "@/pages/MapView"
+import CreateRidePage from "@/pages/CreateRide"
+
+// (optionnel pour plus tard)
+const Placeholder = ({ title }: { title: string }) => (
+  <div className="p-6">{title}</div>
+)
 
 export default function App() {
-  return <MapView />
+  return (
+    <Routes>
+      {/* Navigation */}
+      <Route path="/" element={<MapView />} />
+      <Route path="/search" element={<Placeholder title="Recherche" />} />
+      <Route path="/ride/create" element={<CreateRidePage />} />
+
+      {/* Mes trajets */}
+      <Route path="/bookings" element={<Placeholder title="Mes réservations" />} />
+      <Route path="/my-rides" element={<Placeholder title="Mes trajets" />} />
+      <Route path="/history" element={<Placeholder title="Historique" />} />
+
+      {/* Communication */}
+      <Route path="/messages" element={<Placeholder title="Messages" />} />
+      <Route path="/reviews" element={<Placeholder title="Avis" />} />
+
+      {/* Paiements */}
+      <Route path="/payments" element={<Placeholder title="Paiements" />} />
+      <Route path="/wallet" element={<Placeholder title="Portefeuille" />} />
+
+      {/* Paramètres */}
+      <Route path="/settings" element={<Placeholder title="Paramètres" />} />
+      <Route path="/help" element={<Placeholder title="Aide" />} />
+      <Route path="/about" element={<Placeholder title="À propos" />} />
+    </Routes>
+  )
 }

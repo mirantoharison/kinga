@@ -23,7 +23,7 @@ export function Header() {
   const routeTitles: Record<string, string> = {
     "/": "Accueil",
     "/search": "Rechercher un trajet",
-    "/create": "Proposer un trajet",
+    "/ride/create": "Proposer un trajet",
     "/rides": "Mes trajets",
     "/messages": "Messages",
     "/payments": "Paiements",
