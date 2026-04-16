@@ -19,26 +19,25 @@ export function MapDisplay({ position, accuracy, lat, lng }: Props) {
   const tile = TILE_LAYERS[tileKey]
 
   return (
-    <div className="relative h-full w-full">
+    <div className="relative h-full w-full overflow-hidden">
       <MapContainer
         center={position}
         zoom={15}
         style={{ height: "100%", width: "100%" }}
         zoomControl={false}
       >
-        <TileLayer
-          key={tileKey}
-          attribution={tile.attribution}
-          url={tile.url}
-        />
+        <TileLayer key={tileKey} attribution={tile.attribution} url={tile.url} />
 
         <Marker position={position}>
-          <Popup>Tu es ici 📍</Popup>
+          <Popup className="rounded-xl shadow-lg">
+            <div className="text-sm font-medium">📍 Vous êtes ici</div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              {lat.toFixed(5)}, {lng.toFixed(5)}
+            </div>
+          </Popup>
         </Marker>
 
-        {accuracy && (
-          <AccuracyCircle position={position} accuracy={accuracy} />
-        )}
+        {accuracy && <AccuracyCircle position={position} accuracy={accuracy} />}
 
         {tracking && (
           <RecenterMap lat={lat} lng={lng} accuracy={accuracy} autoFit={false} />
