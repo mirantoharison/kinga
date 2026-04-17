@@ -28,7 +28,7 @@ const menus = [
   {
     label: "Navigation",
     items: [
-      { label: "Accueil", icon: Home, path: "/" },
+      { label: "Accueil", icon: Home, path: "/home" },
       { label: "Rechercher un trajet", icon: Search, path: "/ride/search" },
       { label: "Proposer un trajet", icon: PlusCircle, path: "/ride/create" },
     ],
