@@ -5,6 +5,7 @@ import MapView from "@/pages/MapView"
 import CreateRidePage from "@/pages/CreateRide"
 import ListRidePage from "@/pages/ListRide"
 import PaymentPage from "./pages/Payment"
+import DashboardPage from "./pages/Dashboard"
 
 // (optionnel pour plus tard)
 const Placeholder = ({ title }: { title: string }) => (
@@ -16,7 +17,8 @@ export default function App() {
     <Routes>
       {/* Navigation */}
       <Route path="/" element={<MapView />} />
-      <Route path="/ride/search" element={<ListRidePage/>} />
+      <Route path="/home" element={<DashboardPage />} />
+      <Route path="/ride/search" element={<ListRidePage />} />
       <Route path="/ride/create" element={<CreateRidePage />} />
 
       {/* Mes trajets */}
