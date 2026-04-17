@@ -32,9 +32,10 @@ interface Ride {
 
 interface Props {
   ride: Ride
+  mode?: "public" | "dashboard"
 }
 
-export function RideCard({ ride }: Props) {
+export function RideCard({ ride, mode }: Props) {
   const isLastSeat = ride.seats === 1
 
   return (
@@ -135,19 +136,33 @@ export function RideCard({ ride }: Props) {
         {/* ACTIONS */}
         <div className="flex gap-2 pt-2">
 
-          <Button variant="outline" size="sm" className="flex-1 text-xs">
-            <Info className="w-3 h-3 mr-1" />
-            Détails
-          </Button>
+          {mode === "dashboard" ? (
+            <>
+              <Button size="sm" className="flex-1 text-xs">
+                Confirmer
+              </Button>
 
-          <Button variant="outline" size="sm" className="flex-1 text-xs">
-            <MessageCircle className="w-3 h-3 mr-1" />
-            Contacter
-          </Button>
+              <Button variant="outline" size="sm" className="flex-1 text-xs">
+                Voir
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" size="sm" className="flex-1 text-xs">
+                <Info className="w-3 h-3 mr-1" />
+                Détails
+              </Button>
 
-          <Button size="sm" className="flex-1 text-xs">
-            Réserver
-          </Button>
+              <Button variant="outline" size="sm" className="flex-1 text-xs">
+                <MessageCircle className="w-3 h-3 mr-1" />
+                Contacter
+              </Button>
+
+              <Button size="sm" className="flex-1 text-xs">
+                Réserver
+              </Button>
+            </>
+          )}
 
         </div>
 
