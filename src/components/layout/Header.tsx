@@ -22,7 +22,7 @@ export function Header() {
   const location = useLocation()
   const routeTitles: Record<string, string> = {
     "/": "Accueil",
-    "/search": "Rechercher un trajet",
+    "/ride/search": "Rechercher un trajet",
     "/ride/create": "Proposer un trajet",
     "/rides": "Mes trajets",
     "/messages": "Messages",
