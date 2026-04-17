@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom"
 // Pages
 import MapView from "@/pages/MapView"
 import CreateRidePage from "@/pages/CreateRide"
+import ListRidePage from "@/pages/ListRide"
 
 // (optionnel pour plus tard)
 const Placeholder = ({ title }: { title: string }) => (
@@ -14,7 +15,7 @@ export default function App() {
     <Routes>
       {/* Navigation */}
       <Route path="/" element={<MapView />} />
-      <Route path="/search" element={<Placeholder title="Recherche" />} />
+      <Route path="/ride/search" element={<ListRidePage/>} />
       <Route path="/ride/create" element={<CreateRidePage />} />
 
       {/* Mes trajets */}

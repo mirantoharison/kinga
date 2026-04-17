@@ -1,7 +1,7 @@
 "use client"
 
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet"
-import { useState } from "react"
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet"
+import { useEffect, useState } from "react"
 
 import { RoutePreview } from "./RoutePreview"
 import { startIcon, endIcon } from "./MapPins"
@@ -87,4 +87,24 @@ export function MapPicker({ from, to, onSelect, onRouteData }: Props) {
 
     </div>
   )
+}
+
+function MapCenter({
+  from,
+  to,
+}: {
+  from: [number, number] | null
+  to: [number, number] | null
+}) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (to) {
+      map.setView(to, 13, { animate: true })
+    } else if (from) {
+      map.setView(from, 13, { animate: true })
+    }
+  }, [from, to])
+
+  return null
 }
