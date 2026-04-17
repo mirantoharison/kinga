@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-dom"
 import MapView from "@/pages/MapView"
 import CreateRidePage from "@/pages/CreateRide"
 import ListRidePage from "@/pages/ListRide"
+import PaymentPage from "./pages/Payment"
 
 // (optionnel pour plus tard)
 const Placeholder = ({ title }: { title: string }) => (
@@ -28,7 +29,7 @@ export default function App() {
       <Route path="/reviews" element={<Placeholder title="Avis" />} />
 
       {/* Paiements */}
-      <Route path="/payments" element={<Placeholder title="Paiements" />} />
+      <Route path="/payments" element={<PaymentPage />} />
       <Route path="/wallet" element={<Placeholder title="Portefeuille" />} />
 
       {/* Paramètres */}
