@@ -42,3 +42,14 @@ export function getGroupPosition(
     isEnd: !isSameNext,
   }
 }
+
+export const getStatus = (status: string) => {
+  switch (status) {
+    case "confirmed":
+      return { label: "Confirmé", class: "bg-emerald-50 text-emerald-700 border border-emerald-200" }
+    case "pending":
+      return { label: "En attente", class: "bg-amber-50 text-amber-700 border border-amber-200" }
+    default:
+      return { label: "Discussion", class: "bg-blue-50 text-blue-700 border border-blue-200" }
+  }
+}
