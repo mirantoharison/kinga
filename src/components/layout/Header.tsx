@@ -29,6 +29,7 @@ export function Header() {
     "/messages": "Messages",
     "/messages/archived": "Messages archivés",
     "/messages/:rideId": "Discussion privée",
+    "/notifications": "Notifications",
     "/payments": "Paiements",
     "/settings": "Paramètres",
   }

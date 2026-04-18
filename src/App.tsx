@@ -9,6 +9,7 @@ import DashboardPage from "./pages/Dashboard"
 import DiscussionPage from "./pages/Discussion"
 import MessagesListPage from "./pages/ListDiscussion"
 import MessagesArchivedPage from "./pages/ListDiscussionArchived"
+import NotificationsPage from "./pages/ListNotification"
 
 // (optionnel pour plus tard)
 const Placeholder = ({ title }: { title: string }) => (
@@ -33,6 +34,7 @@ export default function App() {
       <Route path="/messages/:rideId" element={<DiscussionPage />} />
       <Route path="/messages/archived" element={<MessagesArchivedPage />} />
       <Route path="/messages" element={<MessagesListPage />} />
+      <Route path="/notifications" element={<NotificationsPage />} />
       <Route path="/reviews" element={<Placeholder title="Avis" />} />
 
       {/* Paiements */}

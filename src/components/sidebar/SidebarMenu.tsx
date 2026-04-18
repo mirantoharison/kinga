@@ -48,7 +48,7 @@ const menus = [
     items: [
       { label: "Messages", icon: MessageCircle, path: "/messages" },
       { label: "Messages archivés", icon: Archive, path: "/messages/archived" },
-      { label: "Notifications", icon: Bell, path: "/notifications" }, // 👈 ajouté
+      { label: "Notifications", icon: Bell, path: "/notifications" },
       { label: "Avis et évaluations", icon: Star, path: "/reviews" },
     ],
   },
