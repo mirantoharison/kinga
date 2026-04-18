@@ -15,3 +15,9 @@ export function getDefaultDateTime() {
 
   return { date, time }
 }
+
+export const TODAY = "Aujourd'hui"
+export const YESTERDAY = "Hier"
+
+export const getTime = () =>
+  new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })

@@ -44,7 +44,7 @@ const menus = [
   {
     label: "Communication",
     items: [
-      { label: "Messages", icon: MessageCircle, path: "/messages" },
+      { label: "Messages", icon: MessageCircle, path: "/ride/test/messages" },
       { label: "Avis et évaluations", icon: Star, path: "/reviews" },
     ],
   },
