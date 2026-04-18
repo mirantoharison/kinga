@@ -192,6 +192,23 @@ export default function NotificationsPage() {
         <Badge variant="secondary">{stats.today} aujourd’hui</Badge>
       </div>
 
+      {/* ACTIONS GLOBAL */}
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-muted-foreground">
+          Gérez rapidement vos notifications
+        </p>
+
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={markAllRead}
+          className="h-7 text-xs"
+        >
+          <CheckCheck className="w-3.5 h-3.5 mr-1" />
+          Tout marquer comme lu
+        </Button>
+      </div>
+
       {/* 🔍 FILTERS */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
@@ -344,10 +361,18 @@ export default function NotificationsPage() {
       <Separator />
 
       {/* FOOTER */}
-      <Button variant="outline" className="w-full" onClick={markAllRead}>
-        <CheckCheck className="w-4 h-4 mr-2" />
-        Tout marquer comme lu
-      </Button>
+      <div className="flex flex-col items-center gap-2 py-2">
+        <p className="text-xs text-muted-foreground">
+          Vous avez consulté {filtered.length} notifications
+        </p>
+
+        <Button
+          variant="outline"
+          className="w-full h-9 text-sm"
+        >
+          Charger les notifications précédentes
+        </Button>
+      </div>
 
     </div>
   )
