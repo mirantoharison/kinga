@@ -22,7 +22,7 @@ export function getGroupPosition(
   prev?: Message,
   next?: Message
 ) {
-  const THRESHOLD = 1
+  const THRESHOLD = 2
   const currentMin = parseTimeToMinutes(current.time)
 
   const isSamePrev = (() => {

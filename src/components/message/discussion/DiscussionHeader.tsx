@@ -13,6 +13,7 @@ import {
   Lock,
   Flag,
   Trash2,
+  RefreshCw,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -30,6 +31,7 @@ interface Props {
   navigate: (path: string) => void
   muted: boolean
   setMuted: React.Dispatch<React.SetStateAction<boolean>>
+  onRefresh: () => void
   ride: {
     from: string
     to: string
@@ -41,6 +43,7 @@ export function DiscussionHeader({
   navigate,
   muted,
   setMuted,
+  onRefresh,
   ride,
 }: Props) {
   return (
@@ -64,6 +67,11 @@ export function DiscussionHeader({
           </span>
         </div>
       </div>
+
+      {/* REFRESH */}
+      <Button size="icon" variant="ghost" className="shrink-0" onClick={onRefresh}>
+        <RefreshCw className="w-4 h-4" />
+      </Button>
 
       {/* MENU */}
       <DropdownMenu>

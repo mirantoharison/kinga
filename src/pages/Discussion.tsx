@@ -18,6 +18,7 @@ import {
 import { groupMessagesByDate } from "@/lib/messageUtils"
 
 import { type Message, type NewMessage } from "@/components/message/discussion/MessageBubble"
+import { Handshake, MapPin, MessageCircle, ShieldCheck } from "lucide-react"
 
 /* ───────────── MOCK RIDE ───────────── */
 
@@ -43,6 +44,7 @@ export default function DiscussionPage() {
   const endRef = useRef<HTMLDivElement>(null)
 
   const [muted, setMuted] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -97,6 +99,11 @@ export default function DiscussionPage() {
       )
     )
 
+  const handleRefresh = () => {
+    setLoading(true)
+    setTimeout(() => setLoading(false), 800) // remplace par ton vrai fetch
+  }
+
   const grouped = groupMessagesByDate(messages)
 
   /* ───────────── AUTO SCROLL ───────────── */
@@ -104,6 +111,11 @@ export default function DiscussionPage() {
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 800)
+    return () => clearTimeout(timer)
+  }, [])
 
   /* ───────────── UI ───────────── */
 
@@ -115,6 +127,7 @@ export default function DiscussionPage() {
         navigate={navigate}
         muted={muted}
         setMuted={setMuted}
+        onRefresh={handleRefresh} 
         ride={ride}
       />
 
@@ -129,26 +142,93 @@ export default function DiscussionPage() {
         <Separator />
 
         {/* MESSAGE INFO */}
-        <div className="px-6 py-4 flex flex-col items-center gap-2 text-center">
-          <p className="text-[11px] font-semibold text-foreground/60 uppercase tracking-wide">
-            Discussion sécurisée
-          </p>
+        <div className="px-6 py-4 flex flex-col items-center gap-3 text-center">
 
+          {/* TITLE */}
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-foreground/60" />
+            <p className="text-[11px] font-semibold text-foreground/60 uppercase tracking-wide">
+              Discussion sécurisée
+            </p>
+          </div>
+
+          {/* DESCRIPTION */}
           <p className="text-[10px] text-muted-foreground max-w-[450px] leading-snug">
             Cet espace vous permet d’échanger librement avec le conducteur avant de confirmer votre place.
-            Vous pouvez poser vos questions, ajuster les détails du trajet, proposer un prix ou partager
-            votre position en direct pour faciliter votre rencontre le jour du départ.
+            Vous pouvez poser vos questions, clarifier les détails du trajet, discuter des horaires ou des points de rendez-vous,
+            et vous assurer que tout correspond à vos attentes. La discussion vous aide également à vous organiser plus facilement
+            le jour du départ et à éviter toute confusion.
           </p>
+
+          {/* FEATURES */}
+          <div className="flex flex-wrap justify-center gap-3 mt-1 text-[10px] text-muted-foreground">
+
+            <div className="flex items-center gap-1">
+              <MessageCircle className="w-3.5 h-3.5" />
+              <span>Discuter</span>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <Handshake className="w-3.5 h-3.5" />
+              <span>Négocier</span>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5" />
+              <span>Partager position</span>
+            </div>
+
+          </div>
+
         </div>
 
         <Separator />
 
         {/* MESSAGES */}
-        <MessagesList
-          grouped={grouped}
-          onUpdatePrice={updatePrice}
-          endRef={endRef} // 👈 important pour auto-scroll
-        />
+        {loading ? (
+          <div className="flex flex-col gap-3 px-4 py-4">
+
+            {/* Skeleton bulles */}
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className={`flex ${i % 2 === 0 ? "justify-start" : "justify-end"}`}
+              >
+                <div
+                  className={`h-9 rounded-2xl animate-pulse bg-muted ${i % 2 === 0 ? "w-[52%]" : "w-[44%]"
+                    }`}
+                />
+              </div>
+            ))}
+
+            {/* Icône + message */}
+            <div className="flex flex-col items-center gap-2 pt-3">
+              <svg
+                className="animate-spin text-muted-foreground"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+              <span className="text-xs text-muted-foreground">
+                Chargement des messages...
+              </span>
+            </div>
+
+          </div>
+        ) : (
+          <MessagesList
+            grouped={grouped}
+            onUpdatePrice={updatePrice}
+            endRef={endRef}
+          />
+        )}
       </div>
 
       {/* INPUT */}

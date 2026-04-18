@@ -78,13 +78,13 @@ export function MapOverlayControls({ lat, lng, tracking, tileKey, onToggleTracki
   return (
     <>
       {/* Right controls — zoom & recenter */}
-      <div className="absolute top-3 right-3 z-[500] flex flex-col gap-2">
+      <div className="absolute top-3 right-3 z-[1000] flex flex-col gap-2">
         <ZoomButtons />
         <RecenterButton lat={lat} lng={lng} />
       </div>
 
       {/* Top-left — tracking toggle */}
-      <div className="absolute top-3 left-3 z-[500]">
+      <div className="absolute top-3 left-3 z-[1000]">
         <Button
           size="sm"
           variant={tracking ? "default" : "outline"}
