@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 
 import {
-  LineChart,
   Line,
   XAxis,
   YAxis,

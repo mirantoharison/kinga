@@ -21,3 +21,18 @@ export const YESTERDAY = "Hier"
 
 export const getTime = () =>
   new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+
+export function parseTimeToMinutes(time: string) {
+  // format: "09:17 PM"
+  const [hourMin, modifier] = time.split(" ")
+  let [hours, minutes] = hourMin.split(":").map(Number)
+
+  if (modifier === "PM" && hours !== 12) {
+    hours += 12
+  }
+  if (modifier === "AM" && hours === 12) {
+    hours = 0
+  }
+
+  return hours * 60 + minutes
+}

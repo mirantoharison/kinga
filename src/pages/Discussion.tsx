@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { RideCard, type Ride } from "@/components/ride/search/RideCard"
 import { Separator } from "@/components/ui/separator"
+import { RideCard, type Ride } from "@/components/ride/search/RideCard"
 
 import { DiscussionHeader } from "@/components/message/discussion/DiscussionHeader"
 import { MessagesList } from "@/components/message/discussion/MessageList"
@@ -18,9 +18,8 @@ import {
 import { groupMessagesByDate } from "@/lib/messageUtils"
 
 import { type Message, type NewMessage } from "@/components/message/discussion/MessageBubble"
-import { DollarSign, Handshake, MessageSquare, ShieldCheck } from "lucide-react"
 
-/* ───────────────────────── MOCK RIDE ───────────────────────── */
+/* ───────────── MOCK RIDE ───────────── */
 
 const ride: Ride = {
   from: "Antananarivo",
@@ -36,10 +35,11 @@ const ride: Ride = {
   reviews: 120,
 }
 
-/* ───────────────────────── PAGE ───────────────────────── */
+/* ───────────── PAGE ───────────── */
 
 export default function DiscussionPage() {
   const navigate = useNavigate()
+
   const endRef = useRef<HTMLDivElement>(null)
 
   const [muted, setMuted] = useState(false)
@@ -64,10 +64,13 @@ export default function DiscussionPage() {
     {
       id: 3,
       sender: "other",
-      type: "price",
-      price: 12000,
-      status: "pending",
-      time: "09:13",
+      type: "live-location",
+      duration: 30,
+      lat: -18.8792,
+      lng: 47.5079,
+      label: "Antananarivo",
+      accuracy: 20,
+      time: "09:40", // 👈 important pour test logique 15 min
       date: TODAY,
     },
   ])
@@ -96,6 +99,8 @@ export default function DiscussionPage() {
 
   const grouped = groupMessagesByDate(messages)
 
+  /* ───────────── AUTO SCROLL ───────────── */
+
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
@@ -123,27 +128,17 @@ export default function DiscussionPage() {
 
         <Separator />
 
-        {/* MESSAGE D'ACCUEIL */}
+        {/* MESSAGE INFO */}
         <div className="px-6 py-4 flex flex-col items-center gap-2 text-center">
-          {/* Icônes décoratives */}
-          <div className="flex items-center gap-3 text-muted-foreground/40 mb-0.5">
-            <DollarSign className="w-3.5 h-3.5" />
-            <MessageSquare className="w-3.5 h-3.5" />
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <Handshake className="w-3.5 h-3.5" />
-          </div>
-
-          <p className="text-[11px] font-semibold text-foreground/60 tracking-wide uppercase">
+          <p className="text-[11px] font-semibold text-foreground/60 uppercase tracking-wide">
             Discussion sécurisée
           </p>
 
-          <div className="space-y-1.5 max-w-[450px] w-full">
-            <p className="text-[10px] text-muted-foreground leading-[1.5]">
-              Cet espace vous permet de vous accorder avec le conducteur avant de confirmer votre
-              place. Négociez le prix, posez vos questions sur le trajet, ou précisez des détails
-              pratiques comme le point de départ exact. Vous pouvez aussi partager votre position en direct le jour du départ pour faciliter la rencontre, ou envoyer une pièce jointe si nécessaire. Les messages ne sont visibles que par vous et le conducteur.
-            </p>
-          </div>
+          <p className="text-[10px] text-muted-foreground max-w-[450px] leading-snug">
+            Cet espace vous permet d’échanger librement avec le conducteur avant de confirmer votre place.
+            Vous pouvez poser vos questions, ajuster les détails du trajet, proposer un prix ou partager
+            votre position en direct pour faciliter votre rencontre le jour du départ.
+          </p>
         </div>
 
         <Separator />
@@ -152,7 +147,7 @@ export default function DiscussionPage() {
         <MessagesList
           grouped={grouped}
           onUpdatePrice={updatePrice}
-          endRef={endRef}
+          endRef={endRef} // 👈 important pour auto-scroll
         />
       </div>
 
