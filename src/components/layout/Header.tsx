@@ -27,6 +27,7 @@ export function Header() {
     "/ride/create": "Proposer un trajet",
     "/rides": "Mes trajets",
     "/messages": "Messages",
+    "/messages/archived": "Messages archivés",
     "/messages/:rideId": "Discussion privée",
     "/payments": "Paiements",
     "/settings": "Paramètres",
@@ -109,25 +110,106 @@ export function Header() {
               </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="w-64">
-              <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-              <DropdownMenuSeparator />
+            <DropdownMenuContent align="end" className="w-80 p-0">
 
-              <DropdownMenuItem>
-                🚗 Nouvelle demande de trajet reçue
-              </DropdownMenuItem>
+              {/* HEADER */}
+              <div className="px-4 py-3 border-b flex items-center justify-between">
+                <p className="text-sm font-semibold">Notifications</p>
+                <span className="text-[11px] text-muted-foreground">3 non lues</span>
+              </div>
 
-              <DropdownMenuItem>
-                💬 Nouveau message d’un passager
-              </DropdownMenuItem>
+              {/* LIST */}
+              <div className="max-h-[320px] overflow-y-auto">
 
-              <DropdownMenuItem>
-                ⭐ Vous avez reçu une nouvelle évaluation
-              </DropdownMenuItem>
+                {/* ITEM */}
+                <div className="px-4 py-3 flex gap-3 hover:bg-muted/50 transition cursor-pointer">
+                  <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                    🚗
+                  </div>
 
-              <DropdownMenuItem>
-                💳 Paiement confirmé avec succès
-              </DropdownMenuItem>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium leading-snug">
+                      Nouvelle demande de trajet
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">
+                      Antananarivo → Mahajanga
+                    </p>
+                    <p className="text-[10px] text-muted-foreground mt-1">
+                      Il y a 2 min
+                    </p>
+                  </div>
+
+                  <span className="w-2 h-2 bg-blue-500 rounded-full mt-1" />
+                </div>
+
+                {/* ITEM */}
+                <div className="px-4 py-3 flex gap-3 hover:bg-muted/50 transition cursor-pointer">
+                  <div className="w-9 h-9 rounded-lg bg-violet-500/10 flex items-center justify-center">
+                    💬
+                  </div>
+
+                  <div className="flex-1">
+                    <p className="text-xs font-medium leading-snug">
+                      Nouveau message reçu
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">
+                      “Le départ est confirmé pour 14h”
+                    </p>
+                    <p className="text-[10px] text-muted-foreground mt-1">
+                      Il y a 10 min
+                    </p>
+                  </div>
+
+                  <span className="w-2 h-2 bg-violet-500 rounded-full mt-1" />
+                </div>
+
+                {/* ITEM */}
+                <div className="px-4 py-3 flex gap-3 hover:bg-muted/50 transition cursor-pointer">
+                  <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                    ⭐
+                  </div>
+
+                  <div className="flex-1">
+                    <p className="text-xs font-medium leading-snug">
+                      Nouvelle évaluation
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">
+                      5 étoiles reçues après un trajet
+                    </p>
+                    <p className="text-[10px] text-muted-foreground mt-1">
+                      Hier
+                    </p>
+                  </div>
+                </div>
+
+                {/* ITEM */}
+                <div className="px-4 py-3 flex gap-3 hover:bg-muted/50 transition cursor-pointer">
+                  <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                    💳
+                  </div>
+
+                  <div className="flex-1">
+                    <p className="text-xs font-medium leading-snug">
+                      Paiement confirmé
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">
+                      +20 tokens ajoutés
+                    </p>
+                    <p className="text-[10px] text-muted-foreground mt-1">
+                      Il y a 1h
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* FOOTER */}
+              <div className="border-t p-2">
+                <button className="w-full text-[11px] text-center text-primary hover:underline">
+                  Voir toutes les notifications
+                </button>
+              </div>
+
             </DropdownMenuContent>
           </DropdownMenu>
 

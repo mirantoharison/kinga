@@ -10,7 +10,7 @@ export interface Conversation {
   duration: string
   price: number
   priceStatus: string
-  status: "pending" | "confirmed" | "discussion"
+  status: "pending" | "confirmed" | "discussion" | "archived"
   urgency?: string
   lastMessage: string
   unread: number

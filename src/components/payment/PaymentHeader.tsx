@@ -12,8 +12,8 @@ export function PaymentHeader({ tokens }: Props) {
     <div className="flex items-start gap-4 p-4 rounded-2xl border bg-muted/40">
 
       {/* ICON */}
-      <div className="w-11 h-11 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-        <CreditCard className="w-5 h-5 text-emerald-500" />
+      <div className="w-11 h-11 rounded-xl bg-blue-500/10 flex items-center justify-center">
+        <CreditCard className="w-5 h-5 text-blue-500" />
       </div>
 
       {/* CONTENT */}
@@ -34,7 +34,7 @@ export function PaymentHeader({ tokens }: Props) {
       </div>
 
       {/* BADGE */}
-      <Badge className="bg-emerald-50 text-emerald-600 border">
+      <Badge className="bg-blue-50 text-blue-600 border">
         {tokens} tokens
       </Badge>
 

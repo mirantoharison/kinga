@@ -3,8 +3,9 @@
 interface Stats {
   total: number
   unread: number
-  confirmed: number
-  pending: number
+  confirmed?: number
+  pending?: number
+  archived?: number
 }
 
 interface Props {
