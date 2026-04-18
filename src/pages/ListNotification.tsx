@@ -176,8 +176,7 @@ export default function NotificationsPage() {
             paiements ainsi que les informations système utiles au bon déroulement de
             vos déplacements. Les notifications les plus récentes et non lues sont mises en avant afin de
             vous permettre de réagir rapidement, suivre l’évolution de vos trajets en
-            temps réel et rester informé à chaque étape de votre expérience. Vous pouvez consulter, filtrer ou marquer comme lues ces notifications à tout
-            moment pour garder une vue claire et organisée de votre activité.
+            temps réel et rester informé à chaque étape de votre expérience.
           </p>
         </div>
 
@@ -250,8 +249,13 @@ export default function NotificationsPage() {
         {filtered.map((n) => (
           <div
             key={n.id}
-            className={`cursor-pointer transition-all rounded-2xl border ${selected.includes(n.id) ? "ring-2 ring-emerald-500" : ""
-              } ${!n.read ? "bg-emerald-50/40 border-emerald-200" : ""}`}
+            className={`cursor-pointer transition-all rounded-2xl border ${selected.includes(n.id)
+              ? "ring-2 ring-emerald-500"
+              : ""
+              } ${!n.read
+                ? "bg-emerald-500/5 border-emerald-500/20 hover:bg-emerald-500/10"
+                : "hover:bg-muted/40"
+              }`}
             onClick={() => {
               if (multiSelect) toggleSelect(n.id)
               else markOneRead(n.id)
@@ -280,7 +284,7 @@ export default function NotificationsPage() {
 
                 <div className="flex items-center gap-2">
                   {!n.read && (
-                    <span className="w-2 h-2 bg-emerald-500 rounded-full" />
+                    <span className="w-2 h-2 rounded-full bg-emerald-500/80" />
                   )}
                   <Badge variant="outline" className="text-[10px]">
                     {n.type}
@@ -300,23 +304,21 @@ export default function NotificationsPage() {
               </p>
 
               {/* FOOTER */}
+              {!n.read && <Separator className="opacity-60" />}
               <div className="flex justify-end">
                 {!n.read && (
-                  <>
-                    <Separator />
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-6 text-[11px] px-2"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        markOneRead(n.id)
-                      }}
-                    >
-                      <CheckCheck className="w-3 h-3 mr-1" />
-                      Marquer lu
-                    </Button>
-                  </>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="h-6 text-[11px] px-2"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      markOneRead(n.id)
+                    }}
+                  >
+                    <CheckCheck className="w-3 h-3 mr-1" />
+                    Marquer lu
+                  </Button>
                 )}
               </div>
 
