@@ -14,18 +14,20 @@ import {
 
 import { useEffect, useState } from "react"
 import { useTheme } from "@/hooks/use-theme"
-import { useLocation } from "react-router-dom"
+import { useLocation, matchPath } from "react-router-dom"
 
 export function Header() {
   const { theme, toggle } = useTheme()
   const [lang, setLang] = useState("fr")
   const location = useLocation()
+
   const routeTitles: Record<string, string> = {
     "/": "Accueil",
     "/ride/search": "Rechercher un trajet",
     "/ride/create": "Proposer un trajet",
     "/rides": "Mes trajets",
     "/messages": "Messages",
+    "/messages/:rideId": "Discussion privée",
     "/payments": "Paiements",
     "/settings": "Paramètres",
   }
@@ -40,6 +42,15 @@ export function Header() {
     localStorage.setItem("lang", value)
   }
 
+  // ✅ Fonction pour matcher dynamiquement les routes
+  const getRouteTitle = () => {
+    for (const path in routeTitles) {
+      const match = matchPath({ path, end: true }, location.pathname)
+      if (match) return routeTitles[path]
+    }
+    return "Accueil"
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-sm">
       <div className="h-14 flex items-center justify-between gap-3 px-4">
@@ -50,7 +61,7 @@ export function Header() {
 
           <div>
             <p className="text-sm font-medium">
-              {routeTitles[location.pathname] || "Accueil"}
+              {getRouteTitle()}
             </p>
           </div>
         </div>
