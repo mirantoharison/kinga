@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 
-interface Ride {
+export interface Ride {
   from: string
   to: string
   time: string
@@ -32,7 +32,7 @@ interface Ride {
 
 interface Props {
   ride: Ride
-  mode?: "public" | "dashboard"
+  mode?: "public" | "dashboard" | "message"
 }
 
 export function RideCard({ ride, mode }: Props) {
@@ -144,6 +144,17 @@ export function RideCard({ ride, mode }: Props) {
 
               <Button variant="outline" size="sm" className="flex-1 text-xs">
                 Voir
+              </Button>
+            </>
+          ) : mode === "message" ? (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 text-xs"
+              >
+                <Info className="w-3 h-3 mr-1" />
+                Voir le trajet
               </Button>
             </>
           ) : (

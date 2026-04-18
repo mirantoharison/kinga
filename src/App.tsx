@@ -6,6 +6,7 @@ import CreateRidePage from "@/pages/CreateRide"
 import ListRidePage from "@/pages/ListRide"
 import PaymentPage from "./pages/Payment"
 import DashboardPage from "./pages/Dashboard"
+import DiscussionPage from "./pages/Discussion"
 
 // (optionnel pour plus tard)
 const Placeholder = ({ title }: { title: string }) => (
@@ -27,7 +28,7 @@ export default function App() {
       <Route path="/history" element={<Placeholder title="Historique" />} />
 
       {/* Communication */}
-      <Route path="/messages" element={<Placeholder title="Messages" />} />
+      <Route path="/ride/:rideId/messages" element={<DiscussionPage />} />
       <Route path="/reviews" element={<Placeholder title="Avis" />} />
 
       {/* Paiements */}
