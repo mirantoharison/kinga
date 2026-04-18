@@ -1,7 +1,7 @@
 "use client"
 
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Moon, Sun, Bell, Globe } from "lucide-react"
+import { Moon, Sun, Bell, Globe, CreditCard, Clock, Car, MapPin, User, MessageCircle, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -110,7 +110,7 @@ export function Header() {
               </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="w-80 p-0">
+            <DropdownMenuContent align="end" className="w-96 p-0">
 
               {/* HEADER */}
               <div className="px-4 py-3 border-b flex items-center justify-between">
@@ -119,85 +119,118 @@ export function Header() {
               </div>
 
               {/* LIST */}
-              <div className="max-h-[320px] overflow-y-auto">
+              <div className="max-h-[360px] overflow-y-auto">
 
-                {/* ITEM */}
+                {/* TRAJET */}
                 <div className="px-4 py-3 flex gap-3 hover:bg-muted/50 transition cursor-pointer">
-                  <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                    🚗
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                    <Car className="w-4 h-4 text-blue-500" />
                   </div>
 
-                  <div className="flex-1">
-                    <p className="text-xs font-medium leading-snug">
-                      Nouvelle demande de trajet
+                  <div className="flex-1 space-y-1">
+                    <p className="text-xs font-medium">
+                      Nouvelle demande de réservation
                     </p>
-                    <p className="text-[11px] text-muted-foreground">
-                      Antananarivo → Mahajanga
-                    </p>
-                    <p className="text-[10px] text-muted-foreground mt-1">
-                      Il y a 2 min
-                    </p>
+
+                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                      <MapPin className="w-3 h-3" />
+                      <span>Antananarivo → Mahajanga</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                      <User className="w-3 h-3" />
+                      <span>Rakoto Jean</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground pt-1">
+                      <Clock className="w-3 h-3" />
+                      <span>Il y a 2 min</span>
+                    </div>
                   </div>
 
                   <span className="w-2 h-2 bg-blue-500 rounded-full mt-1" />
                 </div>
 
-                {/* ITEM */}
+                {/* MESSAGE */}
                 <div className="px-4 py-3 flex gap-3 hover:bg-muted/50 transition cursor-pointer">
-                  <div className="w-9 h-9 rounded-lg bg-violet-500/10 flex items-center justify-center">
-                    💬
+                  <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center">
+                    <MessageCircle className="w-4 h-4 text-violet-500" />
                   </div>
 
-                  <div className="flex-1">
-                    <p className="text-xs font-medium leading-snug">
+                  <div className="flex-1 space-y-1">
+                    <p className="text-xs font-medium">
                       Nouveau message reçu
                     </p>
-                    <p className="text-[11px] text-muted-foreground">
-                      “Le départ est confirmé pour 14h”
+
+                    <p className="text-[11px] text-muted-foreground line-clamp-2">
+                      Le départ est confirmé pour 14h, merci d’arriver 10 minutes en avance.
                     </p>
-                    <p className="text-[10px] text-muted-foreground mt-1">
-                      Il y a 10 min
-                    </p>
+
+                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                      <User className="w-3 h-3" />
+                      <span>Conducteur : Rabe Hery</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground pt-1">
+                      <Clock className="w-3 h-3" />
+                      <span>Il y a 10 min</span>
+                    </div>
                   </div>
 
                   <span className="w-2 h-2 bg-violet-500 rounded-full mt-1" />
                 </div>
 
-                {/* ITEM */}
+                {/* AVIS */}
                 <div className="px-4 py-3 flex gap-3 hover:bg-muted/50 transition cursor-pointer">
-                  <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                    ⭐
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                    <Star className="w-4 h-4 text-amber-500" />
                   </div>
 
-                  <div className="flex-1">
-                    <p className="text-xs font-medium leading-snug">
-                      Nouvelle évaluation
+                  <div className="flex-1 space-y-1">
+                    <p className="text-xs font-medium">
+                      Nouvelle évaluation reçue
                     </p>
+
                     <p className="text-[11px] text-muted-foreground">
-                      5 étoiles reçues après un trajet
+                      Note : 5/5 — Très bon trajet, conducteur ponctuel.
                     </p>
-                    <p className="text-[10px] text-muted-foreground mt-1">
-                      Hier
-                    </p>
+
+                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                      <User className="w-3 h-3" />
+                      <span>Par : Ando Sarah</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground pt-1">
+                      <Clock className="w-3 h-3" />
+                      <span>Hier</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* ITEM */}
+                {/* PAIEMENT */}
                 <div className="px-4 py-3 flex gap-3 hover:bg-muted/50 transition cursor-pointer">
-                  <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                    💳
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                    <CreditCard className="w-4 h-4 text-emerald-500" />
                   </div>
 
-                  <div className="flex-1">
-                    <p className="text-xs font-medium leading-snug">
+                  <div className="flex-1 space-y-1">
+                    <p className="text-xs font-medium">
                       Paiement confirmé
                     </p>
+
                     <p className="text-[11px] text-muted-foreground">
-                      +20 tokens ajoutés
+                      +20 tokens ajoutés à votre solde
                     </p>
-                    <p className="text-[10px] text-muted-foreground mt-1">
-                      Il y a 1h
-                    </p>
+
+                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                      <CreditCard className="w-3 h-3" />
+                      <span>Référence : TRX-45821</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground pt-1">
+                      <Clock className="w-3 h-3" />
+                      <span>Il y a 1h</span>
+                    </div>
                   </div>
                 </div>
 
