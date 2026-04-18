@@ -99,8 +99,6 @@ export function MessagesList({ grouped, onUpdatePrice, endRef }: Props) {
                 ? group.messages[index + 1]
                 : regrouped[groupIndex + 1]?.messages[0]
 
-                console.log(prev, msg, next)
-
             return (
               <MessageBubble
                 key={msg.id}

@@ -36,7 +36,7 @@ export function AttachPopover({ push, fileInputRef }: any) {
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-60 p-4 space-y-3">
+      <PopoverContent className="w-60 p-4 space-y-3 z-[9999]">
         <div>
           <p className="text-sm font-semibold">Envoyer une pièce jointe</p>
           <p className="text-xs text-muted-foreground mt-0.5 leading-snug">

@@ -22,25 +22,20 @@ export function getGroupPosition(
   prev?: Message,
   next?: Message
 ) {
-  const threshold = 15
-
+  const THRESHOLD = 1
   const currentMin = parseTimeToMinutes(current.time)
 
-  const prevMin = prev ? parseTimeToMinutes(prev.time) : null
-  const nextMin = next ? parseTimeToMinutes(next.time) : null
+  const isSamePrev = (() => {
+    if (!prev || prev.sender !== current.sender) return false
+    const diff = currentMin - parseTimeToMinutes(prev.time)
+    return diff >= 0 && diff < THRESHOLD
+  })()
 
-  // 👇 C’EST ICI que tu mets ton code
-  const isSamePrev =
-    prev &&
-    prev.sender === current.sender &&
-    prev.date === current.date &&
-    currentMin - prevMin! < threshold
-
-  const isSameNext =
-    next &&
-    next.sender === current.sender &&
-    next.date === current.date &&
-    nextMin! - currentMin < threshold
+  const isSameNext = (() => {
+    if (!next || next.sender !== current.sender) return false
+    const diff = parseTimeToMinutes(next.time) - currentMin
+    return diff >= 0 && diff < THRESHOLD
+  })()
 
   return {
     isStart: !isSamePrev,

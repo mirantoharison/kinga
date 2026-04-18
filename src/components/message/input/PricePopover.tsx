@@ -35,7 +35,7 @@ export function PricePopover({ push }: any) {
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-64 p-4 space-y-3">
+      <PopoverContent className="w-64 p-4 space-y-3 z-[9999]">
         <div>
           <p className="text-sm font-semibold">Proposer un prix</p>
           <p className="text-xs text-muted-foreground mt-0.5 leading-snug">
