@@ -1,5 +1,7 @@
 "use client"
 
+import { Slider } from "@/components/ui/slider"
+
 interface Props {
   maxPrice: number
   setMaxPrice: (value: number) => void
@@ -14,43 +16,51 @@ export function RideFilters({
   setMinSeats,
 }: Props) {
   return (
-    <div className="p-4 rounded-xl border bg-muted/40 space-y-4">
+    <div className="p-4 rounded-xl border bg-muted/40 space-y-5">
 
       {/* DESCRIPTION */}
       <p className="text-xs text-muted-foreground leading-relaxed">
-        Les filtres vous permettent d’affiner votre recherche en fonction de vos contraintes.
-        Vous pouvez par exemple limiter le prix ou choisir un trajet avec moins de voyageurs pour plus de confort.
+        Affinez votre recherche selon vos préférences.
+        Ajustez le prix et le nombre de voyageurs pour trouver un trajet adapté à votre confort et à votre budget.
       </p>
 
       {/* PRIX */}
-      <div>
-        <p className="text-xs mb-1">
-          Prix maximum : {maxPrice} Ar
-        </p>
+      <div className="space-y-2">
+        <div className="flex justify-between text-xs">
+          <span className="text-muted-foreground">
+            Prix maximum
+          </span>
+          <span className="font-medium text-emerald-600">
+            {maxPrice} Ar
+          </span>
+        </div>
 
-        <input
-          type="range"
+        <Slider
           min={5000}
           max={30000}
-          value={maxPrice}
-          onChange={(e) => setMaxPrice(Number(e.target.value))}
-          className="w-full"
+          step={500}
+          value={[maxPrice]}
+          onValueChange={(val) => setMaxPrice(val[0])}
         />
       </div>
 
       {/* SIÈGES */}
-      <div>
-        <p className="text-xs mb-1">
-          Nombre minimum de voyageurs : {minSeats}
-        </p>
+      <div className="space-y-2">
+        <div className="flex justify-between text-xs">
+          <span className="text-muted-foreground">
+            Voyageurs minimum
+          </span>
+          <span className="font-medium text-emerald-600">
+            {minSeats}
+          </span>
+        </div>
 
-        <input
-          type="range"
+        <Slider
           min={1}
           max={4}
-          value={minSeats}
-          onChange={(e) => setMinSeats(Number(e.target.value))}
-          className="w-full"
+          step={1}
+          value={[minSeats]}
+          onValueChange={(val) => setMinSeats(val[0])}
         />
       </div>
 

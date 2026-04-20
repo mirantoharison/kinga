@@ -28,11 +28,6 @@ export function RideSearch({
         </span>
       </div>
 
-      {/* DESCRIPTION */}
-      <p className="text-xs text-muted-foreground leading-relaxed">
-        Saisissez une ville de départ ou d’arrivée pour filtrer les trajets disponibles au sein de la communauté. La recherche s’effectue en temps réel et met automatiquement à jour les résultats au fur et à mesure de votre saisie, vous permettant de repérer rapidement les trajets correspondant à votre besoin sans avoir à recharger la page.
-      </p>
-
       {/* INPUT + BUTTON */}
       <div className="flex gap-2">
         
