@@ -10,7 +10,7 @@ import DiscussionPage from "./pages/Discussion"
 import MessagesListPage from "./pages/ListDiscussion"
 import MessagesArchivedPage from "./pages/ListDiscussionArchived"
 import NotificationsPage from "./pages/ListNotification"
-import ReviewsPage from "./pages/Listreviews"
+import ReviewsPage from "./pages/ListReviews"
 
 // (optionnel pour plus tard)
 const Placeholder = ({ title }: { title: string }) => (

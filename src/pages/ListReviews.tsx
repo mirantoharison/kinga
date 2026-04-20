@@ -34,40 +34,64 @@ interface Review {
 
 const MOCK_REVIEWS: Review[] = [
   {
-    id: 1, author: "Jean", role: "Conducteur", rating: 5,
-    comment: "Très bon passager, ponctuel et agréable. Trajet très sympa, je recommande.",
-    from: "Antananarivo", to: "Tamatave", date: "2026-04-10",
-    replies: ["Merci pour ton retour ! À bientôt sur la route 🙂"],
+    id: 1,
+    author: "Jean",
+    role: "Conducteur",
+    rating: 5,
+    comment:
+      "Très bon passager, ponctuel et agréable. Le trajet s’est déroulé dans une ambiance détendue avec une excellente communication avant et pendant le voyage. Aucun souci à signaler, je recommande vivement pour de futurs trajets sans hésitation.",
+    from: "Antananarivo",
+    to: "Tamatave",
+    date: "2026-04-10",
+    replies: ["Merci pour ton retour !"],
   },
   {
-    id: 2, author: "Sarah", role: "Passager", rating: 4,
-    comment: "Trajet confortable, conduite fluide. Bon contact, musique agréable.",
-    from: "Fianarantsoa", to: "Antsirabe", date: "2026-04-08",
+    id: 2,
+    author: "Sarah",
+    role: "Passager",
+    rating: 4,
+    comment:
+      "Trajet confortable avec une conduite très fluide. Le conducteur était à l’écoute et le véhicule propre. Petit retard au départ mais rien de très problématique. Dans l’ensemble, une expérience positive que je renouvellerais sans souci.",
+    from: "Fianarantsoa",
+    to: "Antsirabe",
+    date: "2026-04-08",
     replies: [],
   },
   {
-    id: 3, author: "Lucas", role: "Conducteur", rating: 3,
-    comment: "Correct dans l'ensemble. Quelques petits retards mais globalement OK.",
-    from: "Majunga", to: "Antananarivo", date: "2026-04-06",
-    replies: ["Merci pour ton honnêteté. Nous allons nous améliorer."],
-  },
-  {
-    id: 4, author: "Paul", role: "Passager", rating: 2,
-    comment: "Retard important, peu de communication. Expérience décevante.",
-    from: "Diego", to: "Majunga", date: "2026-04-05",
+    id: 3,
+    author: "Lucas",
+    role: "Conducteur",
+    rating: 3,
+    comment:
+      "Expérience globalement correcte. Le passager était sympathique mais il y a eu quelques soucis d’organisation au moment du départ. Rien de grave, mais cela peut être amélioré pour rendre l’expérience encore plus fluide et agréable.",
+    from: "Majunga",
+    to: "Antananarivo",
+    date: "2026-04-06",
     replies: [],
   },
   {
-    id: 5, author: "Haja", role: "Conducteur", rating: 5,
-    comment: "Excellent passager ! Très respectueux et ponctuel. Je prendrai plaisir à voyager à nouveau avec lui.",
-    from: "Antsirabe", to: "Antananarivo", date: "2026-04-03",
+    id: 4,
+    author: "Paul",
+    role: "Passager",
+    rating: 2,
+    comment:
+      "Retard important sans réelle communication en amont. Le trajet s’est finalement déroulé correctement mais le manque d’information a rendu l’expérience stressante. Il serait important d’améliorer la coordination et la communication.",
+    from: "Diego",
+    to: "Majunga",
+    date: "2026-04-05",
     replies: [],
   },
   {
-    id: 6, author: "Miora", role: "Passager", rating: 1,
-    comment: "Voiture en mauvais état, conduite dangereuse. Je ne recommande pas.",
-    from: "Toliara", to: "Fianarantsoa", date: "2026-04-01",
-    replies: ["Nous sommes désolés pour cette expérience. Nous avons transmis le signalement."],
+    id: 5,
+    author: "Haja",
+    role: "Conducteur",
+    rating: 5,
+    comment:
+      "Excellent passager, très respectueux et ponctuel. Le trajet s’est passé dans une excellente ambiance avec des échanges agréables. Je recommande fortement et je serais ravi de voyager à nouveau avec cette personne dans le futur.",
+    from: "Antsirabe",
+    to: "Antananarivo",
+    date: "2026-04-03",
+    replies: [],
   },
 ]
 
@@ -98,6 +122,11 @@ function Stars({ rating }: { rating: number }) {
       ))}
     </div>
   )
+}
+
+function truncateText(text: string, max = 180) {
+  if (text.length <= max) return text
+  return text.slice(0, max) + "..."
 }
 
 /* ─────────────── TOAST ─────────────── */
@@ -245,90 +274,88 @@ function ReviewCard({
         </Modal>
       )}
 
-      <Card className="transition-all hover:shadow-sm duration-150">
-        <CardContent className="px-4 py-3 space-y-2.5">
-
-          {/* HEADER */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="w-7 h-7 rounded-full bg-zinc-700 flex items-center justify-center text-zinc-300 text-xs font-semibold shrink-0">
-                {review.author[0]}
+      <Card className="flex flex-col h-full transition-all hover:shadow-sm duration-150">
+        <CardContent className="flex flex-col h-full px-4 py-3">
+          <div className="flex-1 space-y-2.5">
+            {/* HEADER */}
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-7 h-7 rounded-full bg-zinc-700 flex items-center justify-center text-zinc-300 text-xs font-semibold shrink-0">
+                  {review.author[0]}
+                </div>
+                <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                  <p className="text-xs font-semibold leading-tight">{review.author}</p>
+                  <Badge
+                    variant="outline"
+                    className="text-[10px] h-4 px-1.5 border-zinc-700 bg-zinc-800/50 text-zinc-400 font-normal"
+                  >
+                    {review.role === "Conducteur" ? <Car className="w-2.5 h-2.5 mr-1" /> : <Users className="w-2.5 h-2.5 mr-1" />}
+                    {review.role}
+                  </Badge>
+                  <span className="text-[10px] text-muted-foreground/60">{review.date}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                <p className="text-xs font-semibold leading-tight">{review.author}</p>
-                <Badge
-                  variant="outline"
-                  className="text-[10px] h-4 px-1.5 border-zinc-700 bg-zinc-800/50 text-zinc-400 font-normal"
-                >
-                  {review.role === "Conducteur" ? <Car className="w-2.5 h-2.5 mr-1" /> : <Users className="w-2.5 h-2.5 mr-1" />}
-                  {review.role}
-                </Badge>
-                <span className="text-[10px] text-muted-foreground/60">{review.date}</span>
+
+              <div className="flex items-center gap-1.5 border border-zinc-700/60 rounded-md px-2 py-1 bg-zinc-800/40 shrink-0">
+                <Stars rating={review.rating} />
+                <span className="text-[11px] font-medium text-zinc-400">{review.rating}/5</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 border border-zinc-700/60 rounded-md px-2 py-1 bg-zinc-800/40 shrink-0">
-              <Stars rating={review.rating} />
-              <span className="text-[11px] font-medium text-zinc-400">{review.rating}/5</span>
+            {/* TRAJET */}
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2 text-xs bg-muted px-3 py-1.5 rounded-lg">
+                <MapPin className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <span className="font-medium">{review.from}</span>
+                <span className="text-muted-foreground">→</span>
+                <span className="font-medium">{review.to}</span>
+              </div>
+
+              <div className="flex gap-1">
+                <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => navigate(`/rides/${review.id}`)}>
+                  <ExternalLink className="w-3.5 h-3.5 mr-1" /> Voir
+                </Button>
+                <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={handleCopy}>
+                  <Copy className="w-3.5 h-3.5 mr-1" />
+                  {copied ? "Copié ✓" : "Copier"}
+                </Button>
+              </div>
             </div>
-          </div>
 
-          {/* TRAJET */}
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-2 text-xs bg-muted px-3 py-1.5 rounded-lg">
-              <MapPin className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-              <span className="font-medium">{review.from}</span>
-              <span className="text-muted-foreground">→</span>
-              <span className="font-medium">{review.to}</span>
+            {/* COMMENT */}
+            <div className="relative bg-muted/50 px-4 py-3 rounded-xl border border-border/40">
+              <span className="absolute top-1 left-2.5 text-xl text-muted-foreground/30 font-serif select-none">
+                "
+              </span>
+
+              <p className="text-xs text-muted-foreground italic leading-relaxed pl-3 pr-2">
+                {truncateText(review.comment, 180)}
+              </p>
+
+              <span className="absolute bottom-1 right-3 text-xl text-muted-foreground/30 font-serif select-none">
+                "
+              </span>
             </div>
-
-            <div className="flex gap-1">
-              <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => navigate(`/rides/${review.id}`)}>
-                <ExternalLink className="w-3.5 h-3.5 mr-1" /> Voir
-              </Button>
-              <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={handleCopy}>
-                <Copy className="w-3.5 h-3.5 mr-1" />
-                {copied ? "Copié ✓" : "Copier"}
-              </Button>
-            </div>
-          </div>
-
-          {/* COMMENT */}
-          <div className="relative bg-muted/50 px-4 py-3 rounded-xl border border-border/40">
-            <span className="absolute top-1 left-2.5 text-xl text-muted-foreground/30 font-serif select-none">
-              "
-            </span>
-
-            <p className="text-xs text-muted-foreground italic leading-relaxed pl-3 pr-2">
-              {review.comment}
-            </p>
-
-            <span className="absolute bottom-1 right-3 text-xl text-muted-foreground/30 font-serif select-none">
-              "
-            </span>
           </div>
 
           {/* REPLIES */}
           {localReplies.length > 0 && (
-            <div>
-              <button
-                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setShowReplies((v) => !v)}
-              >
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+
+              <div className="flex items-center gap-1">
                 <MessageCircle className="w-3.5 h-3.5" />
                 {localReplies.length} réponse{localReplies.length > 1 ? "s" : ""}
-                {showReplies ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-              </button>
+              </div>
 
-              {showReplies && (
-                <div className="mt-2 space-y-2 pl-3 border-l-2 border-emerald-200">
-                  {localReplies.map((rep, i) => (
-                    <div key={i} className="text-xs bg-emerald-50 text-emerald-800 px-3 py-2 rounded-lg border border-emerald-100">
-                      <span className="font-medium mr-1">Admin ·</span>{rep}
-                    </div>
-                  ))}
-                </div>
-              )}
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-6 text-[11px] px-2"
+                onClick={() => navigate(`/reviews/${review.id}`)}
+              >
+                Voir détails
+              </Button>
+
             </div>
           )}
 
@@ -339,7 +366,7 @@ function ReviewCard({
           )}
 
           {/* ACTIONS */}
-          <div className="flex items-center justify-between pt-2 border-t gap-2 flex-wrap">
+          <div className="flex items-center justify-between pt-3 border-t mt-3">
             <div className="flex gap-2">
               <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setReplyOpen(true)}>
                 <Reply className="w-3.5 h-3.5 mr-1" /> Répondre
@@ -510,11 +537,38 @@ export default function ReviewsPage() {
         </div>
       </div>
 
+      {/* PAGINATION */}
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-1.5 flex-wrap pt-2">
+          <Button variant="outline" size="sm" onClick={() => setPage((p) => p - 1)} disabled={page === 1}>
+            ← Précédent
+          </Button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+            <Button key={p} size="sm" variant={p === page ? "default" : "outline"} onClick={() => setPage(p)}>
+              {p}
+            </Button>
+          ))}
+          <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={page === totalPages}>
+            Suivant →
+          </Button>
+        </div>
+      )}
+
       {/* LIST */}
       {paginated.length > 0 ? (
-        <div className="space-y-3">
+        <div className="
+          grid gap-3
+          sm:grid-cols-1
+          md:grid-cols-2
+          xl:grid-cols-3
+        ">
           {paginated.map((review) => (
-            <ReviewCard key={review.id} review={review} navigate={navigate} onToast={setToast} />
+            <ReviewCard
+              key={review.id}
+              review={review}
+              navigate={navigate}
+              onToast={setToast}
+            />
           ))}
         </div>
       ) : (
