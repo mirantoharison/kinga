@@ -399,7 +399,7 @@ export default function ReviewsPage() {
   const [page, setPage] = useState(1)
   const [toast, setToast] = useState<string | null>(null)
 
-  const PAGE_SIZE = 3
+  const PAGE_SIZE = 4
 
   const filtered = useMemo(() => {
     let data = [...reviews]
@@ -427,7 +427,7 @@ export default function ReviewsPage() {
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="p-6 max-w-4xl mx-auto space-y-6">
 
       {/* TOAST */}
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
@@ -560,7 +560,6 @@ export default function ReviewsPage() {
           grid gap-3
           sm:grid-cols-1
           md:grid-cols-2
-          xl:grid-cols-3
         ">
           {paginated.map((review) => (
             <ReviewCard

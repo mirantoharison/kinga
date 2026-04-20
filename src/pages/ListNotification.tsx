@@ -1,43 +1,16 @@
 "use client"
 
-import { useState } from "react"
-import {
-  Bell,
-  Search,
-  CheckCheck,
-  Trash2,
-  MessageCircle,
-  Car,
-  CreditCard,
-  Info,
-  Clock,
-} from "lucide-react"
+import { NotificationsHeader } from "@/components/notification/NotificationsHeader"
+import { NotificationsStats } from "@/components/notification/NotificationsStats"
+import { NotificationsFilters, type FilterKey } from "@/components/notification/NotificationsFilters"
+import { NotificationsBulkActions } from "@/components/notification/NotificationsBulkActions"
+import { NotificationsList } from "@/components/notification/NotificationsList"
+import { NotificationsFooter } from "@/components/notification/NotificationsFooter"
 
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Checkbox } from "@/components/ui/checkbox"
+import { useNotifications } from "@/hooks/use-notification"
+import { type Notification } from "@/hooks/use-notification"
 
-type NotificationType = "message" | "ride" | "payment" | "system"
-
-interface Notification {
-  id: string
-  type: NotificationType
-  title: string
-  description: string
-  date: string
-  read: boolean
-}
-
-const FILTERS = {
-  all: "Toutes",
-  unread: "Non lues",
-  message: "Messages",
-  ride: "Trajets",
-  payment: "Paiements",
-  system: "Système",
-}
+/* ─────────────── MOCK DATA ─────────────── */
 
 const initialData: Notification[] = [
   {
@@ -64,52 +37,26 @@ const initialData: Notification[] = [
     date: "Aujourd’hui",
     read: true,
   },
-  {
-    id: "4",
-    type: "system",
-    title: "Mise à jour disponible",
-    description: "De nouvelles fonctionnalités ont été ajoutées",
-    date: "Hier",
-    read: true,
-  },
 ]
 
+/* ─────────────── PAGE ─────────────── */
+
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState(initialData)
-  const [search, setSearch] = useState("")
-  const [filter, setFilter] = useState("all")
-  const [selected, setSelected] = useState<string[]>([])
-
-  /* ─────────────── DERIVED ─────────────── */
-
-  const filtered = notifications.filter((n) => {
-    const matchSearch =
-      n.title.toLowerCase().includes(search.toLowerCase()) ||
-      n.description.toLowerCase().includes(search.toLowerCase())
-
-    const matchFilter =
-      filter === "all" ||
-      (filter === "unread" && !n.read) ||
-      n.type === filter
-
-    return matchSearch && matchFilter
-  })
-
-  const stats = {
-    total: notifications.length,
-    unread: notifications.filter((n) => !n.read).length,
-    today: notifications.filter((n) => n.date.includes("Aujourd’hui")).length,
-  }
-
-  const multiSelect = selected.length > 0
+  const {
+    filtered,
+    stats,
+    search,
+    setSearch,
+    filter,
+    setFilter,
+    selected,
+    toggleSelect,
+    setSelected,
+    setNotifications,
+    notifications,
+  } = useNotifications(initialData)
 
   /* ─────────────── ACTIONS ─────────────── */
-
-  const toggleSelect = (id: string) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    )
-  }
 
   const clearSelection = () => setSelected([])
 
@@ -141,19 +88,8 @@ export default function NotificationsPage() {
     )
   }
 
-  /* ─────────────── HELPERS ─────────────── */
-
-  const getIcon = (type: NotificationType) => {
-    switch (type) {
-      case "message":
-        return <MessageCircle className="w-3.5 h-3.5 text-blue-500" />
-      case "ride":
-        return <Car className="w-3.5 h-3.5 text-emerald-500" />
-      case "payment":
-        return <CreditCard className="w-3.5 h-3.5 text-amber-500" />
-      default:
-        return <Info className="w-3.5 h-3.5 text-muted-foreground" />
-    }
+  const loadMore = () => {
+    console.log("load more…")
   }
 
   /* ─────────────── UI ─────────────── */
@@ -161,218 +97,44 @@ export default function NotificationsPage() {
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
 
-      {/* 🧾 HEADER */}
-      <div className="flex items-start gap-4 p-4 rounded-2xl border bg-muted/40">
-        <div className="w-11 h-11 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
-          <Bell className="w-5 h-5 text-emerald-500" />
-        </div>
+      {/* HEADER */}
+      <NotificationsHeader unreadCount={stats.unread} />
 
-        <div className="flex-1">
-          <h2 className="text-lg font-semibold">Notifications</h2>
+      {/* STATS */}
+      <NotificationsStats
+        total={stats.total}
+        unread={stats.unread}
+        today={stats.today}
+      />
 
-          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-            Cet espace centralise toutes les activités importantes liées à votre compte :
-            nouveaux messages, mises à jour de trajets, confirmations de réservation,
-            paiements ainsi que les informations système utiles au bon déroulement de
-            vos déplacements. Les notifications les plus récentes et non lues sont mises en avant afin de
-            vous permettre de réagir rapidement, suivre l’évolution de vos trajets en
-            temps réel et rester informé à chaque étape de votre expérience.
-          </p>
-        </div>
+      {/* FILTERS */}
+      <NotificationsFilters
+        search={search}
+        setSearch={setSearch}
+        filter={filter as FilterKey}
+        setFilter={setFilter}
+      />
 
-        <Badge className="bg-emerald-50 text-emerald-600 border shrink-0">
-          {stats.unread} non lue{stats.unread > 1 && "s"}
-        </Badge>
-      </div>
+      {/* BULK ACTIONS */}
+      <NotificationsBulkActions
+        selected={selected}
+        onMarkRead={markSelectedRead}
+        onDelete={deleteSelected}
+        onClear={clearSelection}
+      />
 
-      {/* 📊 STATS */}
-      <div className="flex gap-2 flex-wrap">
-        <Badge>{stats.total} total</Badge>
-        <Badge variant="secondary">{stats.unread} non lues</Badge>
-        <Badge variant="secondary">{stats.today} aujourd’hui</Badge>
-      </div>
-
-      {/* ACTIONS GLOBAL */}
-      <div className="flex items-center justify-between">
-        <p className="text-xs text-muted-foreground">
-          Gérez rapidement vos notifications
-        </p>
-
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={markAllRead}
-          className="h-7 text-xs"
-        >
-          <CheckCheck className="w-3.5 h-3.5 mr-1" />
-          Tout marquer comme lu
-        </Button>
-      </div>
-
-      {/* 🔍 FILTERS */}
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-2">
-          <Search className="w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher une notification..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap pr-3">
-          {(Object.keys(FILTERS) as Array<keyof typeof FILTERS>).map((f) => (
-            <Button
-              key={f}
-              variant={filter === f ? "secondary" : "outline"}
-              size="sm"
-              className="rounded-full text-xs h-7"
-              onClick={() => setFilter(f)}
-            >
-              {FILTERS[f]}
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      {/* ⚡ BULK ACTIONS */}
-      {multiSelect && (
-        <div className="flex items-center justify-between bg-muted/40 border rounded-xl px-4 py-2">
-          <span className="text-xs">
-            {selected.length} sélectionnée{selected.length > 1 && "s"}
-          </span>
-
-          <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={markSelectedRead}>
-              <CheckCheck className="w-4 h-4 mr-1" />
-              Lire
-            </Button>
-
-            <Button size="sm" variant="destructive" onClick={deleteSelected}>
-              <Trash2 className="w-4 h-4 mr-1" />
-              Supprimer
-            </Button>
-
-            <Button size="sm" variant="ghost" onClick={clearSelection}>
-              Annuler
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* 📦 LIST */}
-      <div className="flex flex-col gap-3">
-
-        {filtered.map((n) => (
-          <div
-            key={n.id}
-            className={`cursor-pointer transition-all rounded-2xl border ${selected.includes(n.id)
-              ? "ring-2 ring-emerald-500"
-              : ""
-              } ${!n.read
-                ? "bg-emerald-500/5 border-emerald-500/20 hover:bg-emerald-500/10"
-                : "hover:bg-muted/40"
-              }`}
-            onClick={() => {
-              if (multiSelect) toggleSelect(n.id)
-              else markOneRead(n.id)
-            }}
-          >
-            <div className="p-4 space-y-3">
-
-              {/* TOP */}
-              <div className="flex items-center justify-between gap-3">
-
-                <div className="flex items-center gap-2 min-w-0">
-                  <Checkbox
-                    checked={selected.includes(n.id)}
-                    onCheckedChange={() => toggleSelect(n.id)}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-
-                  <div className="w-6 h-6 rounded-lg bg-muted flex items-center justify-center">
-                    {getIcon(n.type)}
-                  </div>
-
-                  <span className="text-sm font-semibold truncate">
-                    {n.title}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {!n.read && (
-                    <span className="w-2 h-2 rounded-full bg-emerald-500/80" />
-                  )}
-                  <Badge variant="outline" className="text-[10px]">
-                    {n.type}
-                  </Badge>
-                </div>
-              </div>
-
-              {/* META */}
-              <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                <Clock className="w-3 h-3" />
-                {n.date}
-              </div>
-
-              {/* DESC */}
-              <p className="text-xs text-muted-foreground">
-                {n.description}
-              </p>
-
-              {/* FOOTER */}
-              {!n.read && <Separator className="opacity-60" />}
-              <div className="flex justify-end">
-                {!n.read && (
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    className="h-6 text-[11px] px-2"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      markOneRead(n.id)
-                    }}
-                  >
-                    <CheckCheck className="w-3 h-3 mr-1" />
-                    Marquer lu
-                  </Button>
-                )}
-              </div>
-
-            </div>
-          </div>
-        ))}
-
-        {/* EMPTY */}
-        {filtered.length === 0 && (
-          <div className="text-center py-12">
-            <Bell className="w-6 h-6 mx-auto text-muted-foreground/40 mb-2" />
-            <p className="text-sm font-medium">
-              Aucune notification
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Les nouvelles activités apparaîtront ici
-            </p>
-          </div>
-        )}
-
-      </div>
-
-      <Separator />
+      {/* LIST */}
+      <NotificationsList
+        items={filtered}
+        selected={selected}
+        onToggleSelect={toggleSelect}
+        onMarkRead={markOneRead}
+      />
 
       {/* FOOTER */}
-      <div className="flex flex-col items-center gap-2 py-2">
-        <p className="text-xs text-muted-foreground">
-          Vous avez consulté {filtered.length} notifications
-        </p>
-
-        <Button
-          variant="outline"
-          className="w-full h-9 text-sm"
-        >
-          Charger les notifications précédentes
-        </Button>
-      </div>
+      <NotificationsFooter
+        onLoadMore={loadMore}
+      />
 
     </div>
   )
