@@ -1,8 +1,10 @@
 "use client"
 
 import { RideCard } from "./RideCard"
+import { cn } from "@/lib/utils"
 
 interface Ride {
+  id?: string | number
   from: string
   to: string
   time: string
@@ -18,13 +20,27 @@ interface Ride {
 
 interface Props {
   rides: Ride[]
+  archived?: boolean
 }
 
-export function RideList({ rides }: Props) {
+export function RideList({ rides, archived = false }: Props) {
+
+  if (!rides.length) return null
+
   return (
-    <div className="space-y-4">
+    <div
+      className={cn(
+        "grid gap-4",
+        // 🔥 responsive → déjà prêt pour scaling
+        "md:grid-cols-2 xl:grid-cols-3"
+      )}
+    >
       {rides.map((ride, i) => (
-        <RideCard key={i} ride={ride} />
+        <RideCard
+          key={ride.id ?? `${ride.from}-${ride.to}-${ride.date}-${i}`}
+          ride={ride}
+          archived={archived}
+        />
       ))}
     </div>
   )

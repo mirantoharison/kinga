@@ -8,13 +8,14 @@ import {
   Users,
   Info,
   Star,
-  MessageCircle,
+  Trash2,
 } from "lucide-react"
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 export interface Ride {
   from: string
@@ -33,14 +34,31 @@ export interface Ride {
 interface Props {
   ride: Ride
   mode?: "public" | "dashboard" | "message"
+  archived?: boolean
+  onDelete?: () => void
 }
 
-export function RideCard({ ride, mode }: Props) {
+export function RideCard({ ride, mode = "public", archived = false, onDelete }: Props) {
   const isLastSeat = ride.seats === 1
 
   return (
-    <Card className="hover:shadow-md transition">
+    <Card
+      className={cn(
+        "transition border",
+        "hover:shadow-md",
+        archived && "opacity-70 hover:opacity-100"
+      )}
+    >
       <CardContent className="p-4 space-y-4">
+
+        {/* HEADER BADGE */}
+        {archived && (
+          <div className="flex justify-end">
+            <Badge variant="secondary" className="text-[10px]">
+              Archivé
+            </Badge>
+          </div>
+        )}
 
         {/* TRAJET */}
         <div className="space-y-3">
@@ -66,8 +84,8 @@ export function RideCard({ ride, mode }: Props) {
           </div>
 
           <div className="flex justify-between text-xs font-medium">
-            <span>{ride.from}</span>
-            <span>{ride.to}</span>
+            <span className="truncate max-w-[45%]">{ride.from}</span>
+            <span className="truncate max-w-[45%] text-right">{ride.to}</span>
           </div>
 
         </div>
@@ -91,8 +109,8 @@ export function RideCard({ ride, mode }: Props) {
           </span>
 
           {isLastSeat && (
-            <Badge variant="destructive">
-              Dernier voyageur
+            <Badge variant="destructive" className="text-[10px]">
+              Dernière place
             </Badge>
           )}
 
@@ -100,7 +118,7 @@ export function RideCard({ ride, mode }: Props) {
 
         <Separator />
 
-        {/* DRIVER */}
+        {/* DRIVER + PRICE */}
         <div className="flex justify-between items-center">
 
           <div className="flex items-center gap-3">
@@ -127,46 +145,63 @@ export function RideCard({ ride, mode }: Props) {
               {ride.price} Ar
             </p>
             <p className="text-xs text-muted-foreground">
-              par voyageur
+              / voyageur
             </p>
           </div>
 
         </div>
 
-        {/* ACTIONS */}
+        {/* ACTIONS SIMPLIFIÉES */}
         <div className="flex gap-2 pt-2">
 
           {mode === "dashboard" ? (
             <>
-              <Button size="sm" className="flex-1 text-xs">
-                Confirmer
-              </Button>
-
               <Button variant="outline" size="sm" className="flex-1 text-xs">
+                <Info className="w-3 h-3 mr-1" />
                 Voir
               </Button>
+
+              {onDelete && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="flex-1 text-xs"
+                  onClick={onDelete}
+                >
+                  <Trash2 className="w-3 h-3 mr-1" />
+                  Supprimer
+                </Button>
+              )}
             </>
           ) : mode === "message" ? (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1 text-xs"
-              >
-                <Info className="w-3 h-3 mr-1" />
-                Voir le trajet
-              </Button>
-            </>
-          ) : (
+            <Button variant="outline" size="sm" className="w-full text-xs">
+              <Info className="w-3 h-3 mr-1" />
+              Voir le trajet
+            </Button>
+          ) : archived ? (
             <>
               <Button variant="outline" size="sm" className="flex-1 text-xs">
                 <Info className="w-3 h-3 mr-1" />
                 Détails
               </Button>
 
+              {onDelete && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="flex-1 text-xs"
+                  onClick={onDelete}
+                >
+                  <Trash2 className="w-3 h-3 mr-1" />
+                  Supprimer
+                </Button>
+              )}
+            </>
+          ) : (
+            <>
               <Button variant="outline" size="sm" className="flex-1 text-xs">
-                <MessageCircle className="w-3 h-3 mr-1" />
-                Contacter
+                <Info className="w-3 h-3 mr-1" />
+                Détails
               </Button>
 
               <Button size="sm" className="flex-1 text-xs">

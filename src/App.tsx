@@ -45,14 +45,13 @@ export default function App() {
       {/* APP */}
       <Route path="/" element={withAppLayout(<MapView />)} />
       <Route path="/home" element={withAppLayout(<DashboardPage />)} />
-      <Route path="/ride/history" element={withAppLayout(<ListRideHistory />)} />
       <Route path="/ride/search" element={withAppLayout(<ListRidePage />)} />
       <Route path="/ride/create" element={withAppLayout(<CreateRidePage />)} />
 
       {/* Mes trajets */}
       <Route path="/bookings" element={withAppLayout(<Placeholder title="Mes réservations" />)} />
       <Route path="/my-rides" element={withAppLayout(<Placeholder title="Mes trajets" />)} />
-      <Route path="/history" element={withAppLayout(<Placeholder title="Historique" />)} />
+      <Route path="/ride/history" element={withAppLayout(<ListRideHistory />)} />
 
       {/* Communication */}
       <Route path="/messages/:rideId" element={withAppLayout(<DiscussionPage />)} />
