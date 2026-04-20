@@ -53,7 +53,6 @@ export default function NotificationsPage() {
     toggleSelect,
     setSelected,
     setNotifications,
-    notifications,
   } = useNotifications(initialData)
 
   /* ─────────────── ACTIONS ─────────────── */
@@ -80,12 +79,6 @@ export default function NotificationsPage() {
       prev.filter((n) => !selected.includes(n.id))
     )
     clearSelection()
-  }
-
-  const markAllRead = () => {
-    setNotifications((prev) =>
-      prev.map((n) => ({ ...n, read: true }))
-    )
   }
 
   const loadMore = () => {

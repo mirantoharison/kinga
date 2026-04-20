@@ -11,6 +11,7 @@ import MessagesListPage from "./pages/ListDiscussion"
 import MessagesArchivedPage from "./pages/ListDiscussionArchived"
 import NotificationsPage from "./pages/ListNotification"
 import ReviewsPage from "./pages/ListReviews"
+import LoginPage from "./pages/Login"
 
 // (optionnel pour plus tard)
 const Placeholder = ({ title }: { title: string }) => (
@@ -20,6 +21,8 @@ const Placeholder = ({ title }: { title: string }) => (
 export default function App() {
   return (
     <Routes>
+      <Route path="/login" element={<LoginPage />} />
+
       {/* Navigation */}
       <Route path="/" element={<MapView />} />
       <Route path="/home" element={<DashboardPage />} />
