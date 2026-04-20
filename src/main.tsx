@@ -1,31 +1,18 @@
 "use client"
 
-import { SidebarProvider } from "@/components/ui/sidebar"
-import { TooltipProvider } from './components/ui/tooltip.tsx'
-import { createRoot } from 'react-dom/client'
-//import { registerSW } from 'virtual:pwa-register'
+import { createRoot } from "react-dom/client"
 import { BrowserRouter } from "react-router-dom"
-import './index.css'
-import App from './App.tsx'
+import { TooltipProvider } from "@/components/ui/tooltip"
+import { SidebarProvider } from "@/components/ui/sidebar"
 
-import { SideBar } from "./components/sidebar/Sidebar"
-import { Header } from "./components/layout/Header"
+import App from "./App"
+import "./index.css"
 
-//registerSW()
-
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
     <TooltipProvider>
       <SidebarProvider>
-        <div className="flex h-screen w-full">
-          <SideBar />
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <Header />
-            <main className="flex-1 overflow-y-auto">
-              <App />
-            </main>
-          </div>
-        </div>
+        <App />
       </SidebarProvider>
     </TooltipProvider>
   </BrowserRouter>

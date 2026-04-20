@@ -67,6 +67,9 @@ export default function MessagesListPage() {
         markOneRead={markOneRead}
         navigate={navigate}
         search={search}
+        onLoadMore={() => console.log("load more…")}
+        hasMore={true}
+        loadingMore={false}
       />
 
     </div>
