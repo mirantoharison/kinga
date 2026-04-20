@@ -13,7 +13,7 @@ import {
   HelpCircle,
   Info,
   Archive,
-  Bell, // ✅ ajouté
+  Bell,
 } from "lucide-react"
 
 import {
@@ -40,7 +40,12 @@ const menus = [
     items: [
       { label: "Mes réservations", icon: Calendar, path: "/bookings" },
       { label: "Trajets proposés", icon: Car, path: "/my-rides" },
-      { label: "Historique des trajets", icon: History, path: "/history" },
+
+      // 🔥 Historique récent (≤ 30 jours)
+      { label: "Historique récent", icon: History, path: "/history" },
+
+      // 🔥 NOUVEAU → Archivés (> 30 jours)
+      { label: "Trajets archivés", icon: Archive, path: "/history/archived" },
     ],
   },
   {

@@ -16,6 +16,7 @@ import MessagesArchivedPage from "@/pages/ListDiscussionArchived"
 import NotificationsPage from "@/pages/ListNotification"
 import ReviewsPage from "@/pages/ListReviews"
 import LoginPage from "@/pages/Login"
+import ListRideHistory from "./pages/ListRideHistory"
 
 // Placeholder
 const Placeholder = ({ title }: { title: string }) => (
@@ -44,6 +45,7 @@ export default function App() {
       {/* APP */}
       <Route path="/" element={withAppLayout(<MapView />)} />
       <Route path="/home" element={withAppLayout(<DashboardPage />)} />
+      <Route path="/ride/history" element={withAppLayout(<ListRideHistory />)} />
       <Route path="/ride/search" element={withAppLayout(<ListRidePage />)} />
       <Route path="/ride/create" element={withAppLayout(<CreateRidePage />)} />
 
