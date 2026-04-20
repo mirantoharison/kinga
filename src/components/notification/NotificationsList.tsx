@@ -11,8 +11,6 @@ interface Props {
   onMarkRead: (id: string) => void
 }
 
-/* ─────────────── COMPONENT ─────────────── */
-
 export function NotificationsList({
   items,
   selected,
@@ -25,16 +23,33 @@ export function NotificationsList({
 
   if (items.length === 0) {
     return (
-      <div className="text-center py-12">
-        <Bell className="w-6 h-6 mx-auto text-muted-foreground/40 mb-2" />
+      <div className="py-6">
+        <div
+          className="
+            text-center flex flex-col items-center
+            border border-dashed border-border
+            rounded-2xl
+            py-10 px-6
+            bg-muted/20
+            transition-colors
+            hover:border-muted-foreground/40
+          "
+        >
+          {/* Icon */}
+          <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center mb-3">
+            <Bell className="w-5 h-5 text-muted-foreground/60" />
+          </div>
 
-        <p className="text-sm font-medium">
-          Aucune notification
-        </p>
+          {/* Title */}
+          <p className="text-sm font-semibold">
+            Aucune notification
+          </p>
 
-        <p className="text-xs text-muted-foreground">
-          Les nouvelles activités apparaîtront ici
-        </p>
+          {/* Description */}
+          <p className="text-xs text-muted-foreground mt-1 max-w-xs leading-relaxed">
+            Les nouvelles activités et mises à jour apparaîtront ici dès qu’elles seront disponibles.
+          </p>
+        </div>
       </div>
     )
   }
@@ -43,7 +58,6 @@ export function NotificationsList({
 
   return (
     <div className="flex flex-col gap-3">
-
       {items.map((n) => (
         <NotificationCard
           key={n.id}
@@ -54,7 +68,6 @@ export function NotificationsList({
           onMarkRead={() => onMarkRead(n.id)}
         />
       ))}
-
     </div>
   )
 }
