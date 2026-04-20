@@ -7,16 +7,15 @@ import { type Ride } from "@/components/ride/search/RideCard"
 import { RideList } from "@/components/ride/search/RideList"
 import { RidePagination } from "@/components/ride/search/RidePagination"
 import { RidePaginationControls } from "@/components/ride/search/RidePaginationControls"
-import { RideHistoryHeader } from "@/components/ride/history/HistoryHeader"
-import { RideHistoryEmpty } from "@/components/ride/history/HistoryRideEmpty"
+import { ArchivedRideHeader } from "@/components/ride/archive/ArchiveRideHeader"
 
 // 🔹 UI
-import { Archive, Info } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
+import { ArchivedRideEmpty } from "@/components/ride/archive/ArchiveRideEmpty"
 
 const ARCHIVE_DAYS = 30
 
-export default function ArchivedRideHistoryPage() {
+export default function ArchivedRidePage() {
 
   /* ───────────────────────── STATE ───────────────────────── */
 
@@ -44,23 +43,21 @@ export default function ArchivedRideHistoryPage() {
     fetchRides()
   }, [])
 
-  /* ───────────────────────── HELPERS ───────────────────────── */
-
-  const now = new Date()
-
-  const getDiffDays = (date: string) =>
-    (now.getTime() - new Date(date).getTime()) / (1000 * 60 * 60 * 24)
-
   /* ───────────────────────── FILTER (ARCHIVÉS) ───────────────────────── */
 
   const archivedRides = useMemo(() => {
+    const now = new Date()
+
     return rides
       .filter((ride) => {
         const rideDate = new Date(ride.date)
-        const isPast = rideDate < now
-        const diffDays = getDiffDays(ride.date)
 
-        return isPast && diffDays > ARCHIVE_DAYS
+        if (rideDate >= now) return false
+
+        const diffDays =
+          (now.getTime() - rideDate.getTime()) / (1000 * 60 * 60 * 24)
+
+        return diffDays > ARCHIVE_DAYS
       })
       .sort(
         (a, b) =>
@@ -91,32 +88,11 @@ export default function ArchivedRideHistoryPage() {
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
 
-      {/* HEADER amélioré */}
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
-          <Archive className="w-5 h-5 text-muted-foreground" />
-        </div>
-
-        <div>
-          <h1 className="text-base font-semibold">
-            Trajets archivés
-          </h1>
-          <p className="text-xs text-muted-foreground">
-            Vos trajets de plus de {ARCHIVE_DAYS} jours
-          </p>
-        </div>
-      </div>
-
-      {/* INFO BLOCK */}
-      <div className="rounded-xl bg-muted/40 border px-4 py-3">
-        <p className="text-xs flex items-start gap-2 text-muted-foreground">
-          <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-          Ces trajets sont conservés à titre d’historique.  
-          Ils n’apparaissent plus dans votre activité récente pour garder une interface claire.
-        </p>
-      </div>
-
-      <Separator />
+      {/* HEADER CLEAN */}
+      <ArchivedRideHeader
+        count={archivedRides.length}
+        archiveDays={ARCHIVE_DAYS}
+      />
 
       {/* LOADING */}
       {loading ? (
@@ -135,7 +111,7 @@ export default function ArchivedRideHistoryPage() {
           />
 
           {archivedRides.length === 0 ? (
-            <RideHistoryEmpty />
+            <ArchivedRideEmpty />
           ) : (
             <>
               {/* PAGINATION TOP */}

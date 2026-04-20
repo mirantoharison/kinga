@@ -40,12 +40,8 @@ const menus = [
     items: [
       { label: "Mes réservations", icon: Calendar, path: "/bookings" },
       { label: "Trajets proposés", icon: Car, path: "/my-rides" },
-
-      // 🔥 Historique récent (≤ 30 jours)
-      { label: "Historique récent", icon: History, path: "/history" },
-
-      // 🔥 NOUVEAU → Archivés (> 30 jours)
-      { label: "Trajets archivés", icon: Archive, path: "/history/archived" },
+      { label: "Historique récent", icon: History, path: "/ride/history" },
+      { label: "Trajets archivés", icon: Archive, path: "/ride/archived" },
     ],
   },
   {

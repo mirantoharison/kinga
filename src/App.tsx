@@ -17,6 +17,7 @@ import NotificationsPage from "@/pages/ListNotification"
 import ReviewsPage from "@/pages/ListReviews"
 import LoginPage from "@/pages/Login"
 import ListRideHistory from "./pages/ListRideHistory"
+import ArchivedRidePage from "./pages/ListRideArchived"
 
 // Placeholder
 const Placeholder = ({ title }: { title: string }) => (
@@ -52,6 +53,7 @@ export default function App() {
       <Route path="/bookings" element={withAppLayout(<Placeholder title="Mes réservations" />)} />
       <Route path="/my-rides" element={withAppLayout(<Placeholder title="Mes trajets" />)} />
       <Route path="/ride/history" element={withAppLayout(<ListRideHistory />)} />
+      <Route path="/ride/archived" element={withAppLayout(<ArchivedRidePage />)} />
 
       {/* Communication */}
       <Route path="/messages/:rideId" element={withAppLayout(<DiscussionPage />)} />
