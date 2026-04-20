@@ -60,7 +60,6 @@ export function MessagesList({ grouped, onUpdatePrice, endRef }: Props) {
 
   return (
     <div className="px-3 py-4 space-y-5">
-
       {/* LOAD MORE */}
       {remaining > 0 && (
         <div className="flex justify-center">

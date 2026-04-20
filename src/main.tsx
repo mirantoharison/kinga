@@ -3,7 +3,7 @@
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { TooltipProvider } from './components/ui/tooltip.tsx'
 import { createRoot } from 'react-dom/client'
-import { registerSW } from 'virtual:pwa-register'
+//import { registerSW } from 'virtual:pwa-register'
 import { BrowserRouter } from "react-router-dom"
 import './index.css'
 import App from './App.tsx'
@@ -11,7 +11,7 @@ import App from './App.tsx'
 import { SideBar } from "./components/sidebar/Sidebar"
 import { Header } from "./components/layout/Header"
 
-registerSW()
+//registerSW()
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
