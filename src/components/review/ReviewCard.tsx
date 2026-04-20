@@ -1,216 +1,224 @@
 "use client"
 
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import {
-  Star,
-  ThumbsUp,
-  ThumbsDown,
-  MessageCircle,
-  Clock,
-  Route,
+  MapPin,
   ExternalLink,
-  MoreHorizontal,
-  Info,
+  Copy,
+  MessageCircle,
   Reply,
+  Flag,
+  Car,
+  Users,
 } from "lucide-react"
 
-import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+
+import { Stars } from "@/components/review/misc/ReviewMiscUi"
+import { truncateText } from "@/lib/reviewUtils"
+
+import { ReplyModal } from "@/components/review/modal/ReplyModal"
+import { FlagModal } from "@/components/review/modal/FlagModal"
+import { type Review } from "@/hooks/use-review"
 
 interface Props {
-  name: string
-  rating: number
-  comment: string
-  avatar?: string
-  date?: string
-  trip?: string
-  rideId?: string
-  likes?: number
-  dislikes?: number
-  replies?: number
-  compact?: boolean
+  review: Review
+  onToast: (msg: string) => void
 }
 
-export function ReviewCard({
-  name,
-  rating,
-  comment,
-  avatar,
-  date,
-  trip,
-  rideId,
-  likes = 0,
-  dislikes = 0,
-  replies = 0,
-  compact = false,
-}: Props) {
+export function ReviewCard({ review, onToast }: Props) {
   const navigate = useNavigate()
-  const [liked, setLiked] = useState(false)
-  const [disliked, setDisliked] = useState(false)
 
-  const isPositive = rating >= 4
-  const isNegative = rating <= 2
+  const [copied, setCopied] = useState(false)
+  const [replyOpen, setReplyOpen] = useState(false)
+  const [flagOpen, setFlagOpen] = useState(false)
+  const [localReplies, setLocalReplies] = useState(review.replies)
 
-  const handleNavigate = () => {
-    if (!rideId) return
-    navigate(`/ride/${rideId}`)
+  /* ───────────── ACTIONS ───────────── */
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(`${review.from} → ${review.to}`)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+    onToast("Trajet copié dans le presse-papiers")
   }
 
-  return (
-    <div
-      className={cn(
-        "flex gap-3 transition",
-        !compact && "p-4 rounded-xl border bg-muted/30 hover:bg-muted/50"
-      )}
-    >
+  const handleSendReply = (text: string) => {
+    setLocalReplies((prev) => [...prev, text])
+    onToast("Réponse envoyée avec succès")
+  }
 
-      {/* AVATAR */}
-      <img
-        src={avatar || `https://i.pravatar.cc/100?u=${name}`}
-        alt={name}
-        className="w-10 h-10 rounded-full object-cover"
+  const handleFlag = () => {
+    onToast("Signalement transmis à la modération")
+  }
+
+  /* ───────────── UI ───────────── */
+
+  return (
+    <>
+      {/* MODALS */}
+      <ReplyModal
+        open={replyOpen}
+        onClose={() => setReplyOpen(false)}
+        review={review}
+        onSend={handleSendReply}
       />
 
-      {/* CONTENT */}
-      <div className="flex-1 space-y-3">
+      <FlagModal
+        open={flagOpen}
+        onClose={() => setFlagOpen(false)}
+        onSubmit={handleFlag}
+      />
 
-        {/* HEADER */}
-        <div className="flex items-center justify-between">
+      {/* CARD */}
+      <Card className="flex flex-col h-full hover:shadow-sm transition-all">
+        <CardContent className="flex flex-col h-full px-4 py-3">
 
-          <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-sm font-medium">{name}</p>
+          <div className="flex-1 space-y-3">
 
-            {isPositive && (
-              <Badge className="text-[10px] bg-emerald-50 text-emerald-600 border">
-                👍 Positif
-              </Badge>
-            )}
+            {/* HEADER */}
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
 
-            {isNegative && (
-              <Badge variant="destructive" className="text-[10px]">
-                ⚠️ Négatif
-              </Badge>
-            )}
+                {/* Avatar (FIX) */}
+                <Avatar className="w-7 h-7">
+                  <AvatarFallback className="text-xs font-semibold bg-muted text-foreground">
+                    {review.author[0]}
+                  </AvatarFallback>
+                </Avatar>
+
+                {/* Infos */}
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <p className="text-xs font-semibold text-foreground">
+                    {review.author}
+                  </p>
+
+                  <Badge
+                    variant="outline"
+                    className="text-[10px] h-4 px-1.5 flex items-center gap-1"
+                  >
+                    {review.role === "Conducteur" ? (
+                      <Car className="w-2.5 h-2.5" />
+                    ) : (
+                      <Users className="w-2.5 h-2.5" />
+                    )}
+                    {review.role}
+                  </Badge>
+
+                  <span className="text-[10px] text-muted-foreground">
+                    {review.date}
+                  </span>
+                </div>
+              </div>
+
+              {/* Rating (FIX LIGHT/DARK) */}
+              <div className="flex items-center gap-1.5 border border-border rounded-md px-2 py-1 bg-muted/60">
+                <Stars rating={review.rating} />
+                <span className="text-[11px] text-foreground">
+                  {review.rating}/5
+                </span>
+              </div>
+            </div>
+
+            {/* TRAJET */}
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2 text-xs bg-muted px-3 py-1.5 rounded-lg">
+                <MapPin className="w-3.5 h-3.5 text-emerald-500" />
+                <span className="font-medium">{review.from}</span>
+                →
+                <span className="font-medium">{review.to}</span>
+              </div>
+
+              <div className="flex gap-1">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 text-xs"
+                  onClick={() => navigate(`/rides/${review.id}`)}
+                >
+                  <ExternalLink className="w-3.5 h-3.5 mr-1" />
+                  Voir
+                </Button>
+
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 text-xs"
+                  onClick={handleCopy}
+                >
+                  <Copy className="w-3.5 h-3.5 mr-1" />
+                  {copied ? "Copié ✓" : "Copier"}
+                </Button>
+              </div>
+            </div>
+
+            {/* COMMENT */}
+            <div className="relative bg-muted/50 px-4 py-3 rounded-xl border border-border">
+              <p className="text-xs text-muted-foreground italic leading-relaxed">
+                {truncateText(review.comment, 180)}
+              </p>
+            </div>
+
           </div>
 
-          {date && (
-            <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-              <Clock className="w-3 h-3" />
-              {date}
-            </span>
-          )}
-
-        </div>
-
-        {/* RATING */}
-        <div className="flex items-center gap-1">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Star
-              key={i}
-              className={cn(
-                "w-3.5 h-3.5",
-                i < rating
-                  ? "text-yellow-500 fill-yellow-500"
-                  : "text-muted-foreground/30"
-              )}
-            />
-          ))}
-
-          <span className="text-xs text-muted-foreground ml-1">
-            {rating.toFixed(1)}
-          </span>
-        </div>
-
-        {/* TRAJET */}
-        {trip && (
-          <button
-            onClick={handleNavigate}
-            disabled={!rideId}
-            className={cn(
-              "flex items-center gap-1 text-[11px]",
-              rideId
-                ? "text-emerald-600 hover:underline cursor-pointer"
-                : "text-muted-foreground"
-            )}
-          >
-            <Route className="w-3 h-3" />
-            {trip}
-            {rideId && <ExternalLink className="w-3 h-3 opacity-60" />}
-          </button>
-        )}
-
-        {/* COMMENT */}
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          {comment}
-        </p>
-
-        {/* STATS */}
-        <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
-
-          {/* LIKE */}
-          <button
-            onClick={() => {
-              setLiked(!liked)
-              if (disliked) setDisliked(false)
-            }}
-            className={cn(
-              "flex items-center gap-1 transition",
-              liked && "text-emerald-600"
-            )}
-          >
-            <ThumbsUp className="w-3 h-3" />
-            {likes + (liked ? 1 : 0)}
-          </button>
-
-          {/* DISLIKE */}
-          <button
-            onClick={() => {
-              setDisliked(!disliked)
-              if (liked) setLiked(false)
-            }}
-            className={cn(
-              "flex items-center gap-1 transition",
-              disliked && "text-red-500"
-            )}
-          >
-            <ThumbsDown className="w-3 h-3" />
-            {dislikes + (disliked ? 1 : 0)}
-          </button>
-
           {/* REPLIES */}
-          <span className="flex items-center gap-1">
-            <MessageCircle className="w-3 h-3" />
-            {replies} réponse{replies > 1 ? "s" : ""}
-          </span>
+          <div className="mt-3 text-xs text-muted-foreground flex justify-between">
+            <div className="flex items-center gap-1">
+              <MessageCircle className="w-3.5 h-3.5" />
+              {localReplies.length} réponse{localReplies.length > 1 && "s"}
+            </div>
 
-        </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-6 text-[11px]"
+              onClick={() => navigate(`/reviews/${review.id}`)}
+            >
+              Voir détails
+            </Button>
+          </div>
 
-        {/* ACTIONS */}
-        <div className="flex gap-2 pt-1">
+          {/* ACTIONS */}
+          <div className="flex justify-between pt-3 border-t border-border mt-3">
+            <div className="flex gap-2">
 
-          <Button variant="outline" size="sm" className="text-xs flex-1">
-            <Info className="w-3 h-3 mr-1" />
-            Détails
-          </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 text-xs"
+                onClick={() => setReplyOpen(true)}
+              >
+                <Reply className="w-3.5 h-3.5 mr-1" />
+                Répondre
+              </Button>
 
-          <Button variant="outline" size="sm" className="text-xs flex-1">
-            <Reply className="w-3 h-3 mr-1" />
-            Répondre
-          </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-7 text-xs text-muted-foreground hover:text-rose-500"
+                onClick={() => setFlagOpen(true)}
+              >
+                <Flag className="w-3.5 h-3.5 mr-1" />
+                Signaler
+              </Button>
+            </div>
 
-          <Button size="sm" className="text-xs flex-1">
-            Contacter
-          </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 text-xs text-muted-foreground"
+              onClick={() => navigate(`/reviews/${review.id}`)}
+            >
+              Détails →
+            </Button>
+          </div>
 
-          <Button variant="ghost" size="icon" className="w-8 h-8">
-            <MoreHorizontal className="w-4 h-4" />
-          </Button>
-
-        </div>
-
-      </div>
-    </div>
+        </CardContent>
+      </Card>
+    </>
   )
 }
