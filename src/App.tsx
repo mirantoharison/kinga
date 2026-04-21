@@ -19,6 +19,7 @@ import LoginPage from "@/pages/Login"
 import RegisterPage from "@/pages/Register"
 import ListRideHistory from "./pages/ListRideHistory"
 import ArchivedRidePage from "./pages/ListRideArchived"
+import ProfilePage from "./pages/Profile"
 
 // Placeholder
 const Placeholder = ({ title }: { title: string }) => (
@@ -76,6 +77,7 @@ export default function App() {
       <Route path="/wallet" element={withAppLayout(<Placeholder title="Portefeuille" />)} />
 
       {/* Paramètres */}
+      <Route path="/profile" element={withAppLayout(<ProfilePage/>)} />
       <Route path="/settings" element={withAppLayout(<Placeholder title="Paramètres" />)} />
       <Route path="/help" element={withAppLayout(<Placeholder title="Aide" />)} />
       <Route path="/about" element={withAppLayout(<Placeholder title="À propos" />)} />

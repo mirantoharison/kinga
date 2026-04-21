@@ -63,6 +63,7 @@ const menus = [
   {
     label: "Paramètres",
     items: [
+      { label: "Mon profil", icon: Info, path: "/profile" },
       { label: "Préférences", icon: Settings, path: "/settings" },
       { label: "Aide", icon: HelpCircle, path: "/help" },
       { label: "À propos", icon: Info, path: "/about" },
