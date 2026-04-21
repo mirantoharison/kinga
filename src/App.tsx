@@ -16,7 +16,7 @@ import MessagesArchivedPage from "@/pages/ListDiscussionArchived"
 import NotificationsPage from "@/pages/ListNotification"
 import ReviewsPage from "@/pages/ListReviews"
 import LoginPage from "@/pages/Login"
-import RegisterPage from "@/pages/Signup"
+import RegisterPage from "@/pages/Register"
 import ListRideHistory from "./pages/ListRideHistory"
 import ArchivedRidePage from "./pages/ListRideArchived"
 
