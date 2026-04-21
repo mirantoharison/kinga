@@ -5,15 +5,19 @@ import { BrowserRouter } from "react-router-dom"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { SidebarProvider } from "@/components/ui/sidebar"
 
+import { ThemeProvider } from "@/provider/ThemeProvider"
+
 import App from "./App"
 import "./index.css"
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
-    <TooltipProvider>
-      <SidebarProvider>
-        <App />
-      </SidebarProvider>
-    </TooltipProvider>
+    <ThemeProvider>
+      <TooltipProvider>
+        <SidebarProvider>
+          <App />
+        </SidebarProvider>
+      </TooltipProvider>
+    </ThemeProvider>
   </BrowserRouter>
 )
