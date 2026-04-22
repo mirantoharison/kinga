@@ -37,6 +37,7 @@ import {
   Trash2,
   CheckCircle2,
   Car,
+  ImagePlus,
 } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
@@ -53,6 +54,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select"
+import { PublicSection } from "@/components/profile/PublicSection"
 
 /* ─────────────────────────────────────────
    SECTION CONNEXION
@@ -310,6 +312,7 @@ function ConnexionSection() {
    MENU
 ───────────────────────────────────────── */
 const menuItems = [
+  { key: "profil", label: "Profil public", icon: ImagePlus },
   { key: "info", label: "Informations de base", icon: User },
   { key: "connexion", label: "Connexion", icon: Lock },
   { key: "legal", label: "Légal", icon: ShieldCheck },
@@ -415,7 +418,7 @@ export default function ProfilePage() {
           <div className="flex">
 
             {/* Sidebar desktop */}
-            <div className="hidden md:block w-[220px] border-r py-6 px-3 space-y-1 flex-shrink-0">
+            <div className="hidden md:block w-[200px] border-r py-4 px-2 space-y-0.5 flex-shrink-0">
               {menuItems.map((item) => {
                 const Icon = item.icon
                 return (
@@ -423,13 +426,13 @@ export default function ProfilePage() {
                     key={item.key}
                     onClick={() => setActive(item.key)}
                     className={cn(
-                      "w-full flex items-center gap-2 text-left text-sm px-3 py-2 rounded-lg transition",
+                      "w-full flex items-center gap-2 text-left text-xs px-2.5 py-1.5 rounded-md transition",
                       active === item.key
                         ? "bg-muted font-medium text-foreground"
                         : "text-muted-foreground hover:bg-muted/50"
                     )}
                   >
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-3.5 h-3.5" />
                     {item.label}
                   </button>
                 )
@@ -438,6 +441,8 @@ export default function ProfilePage() {
 
             {/* Contenu */}
             <div className="flex-1 min-w-0 p-4 md:p-6 space-y-4">
+
+              {active === "profil" && <PublicSection />}
 
               {active === "info" && (
                 <>

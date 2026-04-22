@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import {
   ShieldCheck, CheckCircle2, XCircle, Clock, Info,
-  Upload, FileText, Trash2, RotateCcw, AlertCircle,
-  Eye, Loader2, Send,
+  Upload, FileText, Trash2, Send,
+  Eye, Loader2, AlertCircle,
+  ScanText,
 } from "lucide-react"
 
 /* ─────────────────────────────────────────
@@ -118,6 +119,11 @@ function makeEmptyDoc(): DocState {
 
 /* ─────────────────────────────────────────
    STATUS HELPERS
+   Utilise uniquement les variables CSS shadcn/ui :
+   - success → text-green-* / bg-green-* (via classes Tailwind)
+   - warning → text-yellow-* / bg-yellow-*
+   - destructive → text-destructive / bg-destructive/10
+   - muted    → text-muted-foreground / bg-muted
 ───────────────────────────────────────── */
 function getDocStatusUI(status: DocStatus) {
   switch (status) {
@@ -125,39 +131,39 @@ function getDocStatusUI(status: DocStatus) {
       return {
         label: "Vérifié",
         icon: <CheckCircle2 className="w-3 h-3" />,
-        // Vert très sombre, désaturé
-        badgeCls: "bg-[#0d1f12] text-[#6aab7a] border border-[#1e3a24]",
+        badgeCls:
+          "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20",
       }
     case "pending":
       return {
         label: "En attente",
         icon: <Loader2 className="w-3 h-3 animate-spin" />,
-        // Ambre sombre et discret
-        badgeCls: "bg-[#1a1608] text-[#9a8840] border border-[#2e2610]",
+        badgeCls:
+          "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border border-yellow-500/20",
       }
     case "rejected":
       return {
         label: "Refusé",
         icon: <XCircle className="w-3 h-3" />,
-        // Rouge sombre, pas flashy
-        badgeCls: "bg-[#1a0a0a] text-[#9a5050] border border-[#2e1414]",
+        badgeCls:
+          "bg-destructive/10 text-destructive border border-destructive/20",
       }
     default:
       return {
         label: "Non soumis",
         icon: null,
-        badgeCls: "bg-white/[0.04] text-muted-foreground border border-white/[0.06]",
+        badgeCls:
+          "bg-muted text-muted-foreground border border-border",
       }
   }
 }
 
-// Bordure de la carte selon le statut — subtile, pas colorée à l'excès
 function getCardBorderCls(status: DocStatus) {
   switch (status) {
-    case "verified": return "border-[#1e3a24]"
-    case "rejected":  return "border-[#2e1414]"
-    case "pending":   return "border-[#2e2610]"
-    default:          return "border-white/[0.06]"
+    case "verified": return "border-green-500/20"
+    case "rejected": return "border-destructive/20"
+    case "pending": return "border-yellow-500/20"
+    default: return "border-border"
   }
 }
 
@@ -166,24 +172,24 @@ function getGlobalStatusUI(allVerified: boolean, anyRejected: boolean, anyPendin
     return {
       label: "Profil vérifié",
       icon: <CheckCircle2 className="w-3.5 h-3.5" />,
-      cls: "bg-[#0d1f12] text-[#6aab7a] border border-[#1e3a24]",
+      cls: "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20",
     }
   if (anyRejected)
     return {
       label: "Action requise",
       icon: <XCircle className="w-3.5 h-3.5" />,
-      cls: "bg-[#1a0a0a] text-[#9a5050] border border-[#2e1414]",
+      cls: "bg-destructive/10 text-destructive border border-destructive/20",
     }
   if (anyPending)
     return {
       label: "En cours de vérification",
       icon: <Clock className="w-3.5 h-3.5" />,
-      cls: "bg-[#0a0f1a] text-[#5a7aaa] border border-[#14213a]",
+      cls: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20",
     }
   return {
     label: "Non vérifié",
     icon: <Info className="w-3.5 h-3.5" />,
-    cls: "bg-white/[0.04] text-muted-foreground border border-white/[0.06]",
+    cls: "bg-muted text-muted-foreground border border-border",
   }
 }
 
@@ -207,7 +213,7 @@ function Tooltip({ text }: { text: string }) {
         <Info className="w-3.5 h-3.5" />
       </button>
       {visible && (
-        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 rounded-lg border border-white/[0.08] bg-[#0e1015] p-2 text-[11px] leading-relaxed text-muted-foreground shadow-md z-50">
+        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 rounded-lg border border-border bg-popover text-popover-foreground p-2 text-[11px] leading-relaxed shadow-md z-50">
           {text}
         </span>
       )}
@@ -217,11 +223,10 @@ function Tooltip({ text }: { text: string }) {
 
 function ProgressBar({ value }: { value: number }) {
   return (
-    <div className="w-full h-1 rounded-full bg-white/[0.06] overflow-hidden">
+    <div className="w-full h-1 rounded-full bg-muted overflow-hidden">
       <div
-        className={`h-full rounded-full transition-all duration-500 ease-out ${
-          value === 100 ? "bg-[#4a8a5a]" : "bg-white/30"
-        }`}
+        className={`h-full rounded-full transition-all duration-500 ease-out ${value === 100 ? "bg-green-500" : "bg-primary/40"
+          }`}
         style={{ width: `${value}%` }}
       />
     </div>
@@ -230,20 +235,14 @@ function ProgressBar({ value }: { value: number }) {
 
 function StepsGuide() {
   return (
-    <div className="rounded-xl bg-white/[0.02] border border-white/[0.05] p-3 space-y-2 text-[11px]">
-      <p className="font-medium text-foreground">Comment ça marche ?</p>
-      {[
-        "Choisissez ou glissez votre fichier (JPG, PNG, PDF — 10 Mo max).",
-        "Vérifiez l'aperçu pour vous assurer que le document est lisible.",
-        "Cliquez sur Envoyer — la vérification prend en général moins de 24 h.",
-      ].map((step, i) => (
-        <div key={i} className="flex items-start gap-2.5">
-          <span className="w-4 h-4 rounded-full bg-white/[0.05] border border-white/[0.08] text-[10px] flex items-center justify-center font-medium text-muted-foreground shrink-0 mt-px">
-            {i + 1}
-          </span>
-          <span className="text-muted-foreground leading-relaxed">{step}</span>
-        </div>
-      ))}
+    <div className="rounded-xl border border-border bg-muted/40 p-4 space-y-2">
+      <p className="text-sm font-medium text-foreground flex items-center gap-2">
+        <ScanText className="w-4 h-4 shrink-0" />
+        Comment ça marche ?
+      </p>
+      <p className="text-[12px] text-muted-foreground leading-relaxed">
+        Commencez par choisir ou glisser votre fichier depuis votre appareil ou votre galerie — les formats JPG, PNG, WEBP et PDF sont tous acceptés, dans la limite de 10 Mo par fichier. Avant de soumettre, prenez un moment pour consulter l'aperçu et vérifier que le document est net, bien cadré et entièrement lisible : une image floue ou tronquée est la principale cause de refus. Une fois que tout vous semble correct, cliquez sur <span className="font-medium text-foreground">Envoyer</span>. Notre équipe examine chaque document manuellement afin de garantir la fiabilité des vérifications, et vous recevrez une réponse dans un délai habituel de moins de 24 heures. En cas de refus, la raison vous sera communiquée et vous pourrez soumettre un nouveau fichier à tout moment.
+      </p>
     </div>
   )
 }
@@ -269,15 +268,14 @@ function DropZone({
       onDrop={onDrop}
       className={`
         flex flex-col items-center justify-center gap-3 rounded-xl
-        border border-dashed border-white/[0.07]
-        bg-transparent
+        border border-dashed border-border
         px-4 py-6 cursor-pointer
         transition-colors duration-150
-        hover:bg-white/[0.02] hover:border-white/[0.12]
-        ${dragging ? "bg-white/[0.04] border-white/[0.14]" : ""}
+        hover:bg-muted/50 hover:border-border/80
+        ${dragging ? "bg-muted/60 border-border" : ""}
       `}
     >
-      <div className="w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.07] flex items-center justify-center">
+      <div className="w-9 h-9 rounded-lg bg-muted border border-border flex items-center justify-center">
         <Upload className="w-4 h-4 text-muted-foreground" />
       </div>
 
@@ -294,7 +292,7 @@ function DropZone({
         {["JPG", "PNG", "PDF"].map((t) => (
           <span
             key={t}
-            className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.06] text-muted-foreground"
+            className="text-[10px] px-2 py-0.5 rounded-full bg-muted border border-border text-muted-foreground"
           >
             {t}
           </span>
@@ -320,9 +318,8 @@ function FileRow({
   const isImage = file.type.startsWith("image/")
 
   return (
-    <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 bg-transparent border border-white/[0.05] transition-colors hover:bg-white/[0.02]">
-      {/* Thumbnail */}
-      <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-white/[0.05] bg-transparent flex items-center justify-center">
+    <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 border border-border transition-colors hover:bg-muted/40">
+      <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 border border-border bg-muted flex items-center justify-center">
         {previewUrl && isImage ? (
           <img src={previewUrl} className="w-full h-full object-cover" />
         ) : (
@@ -330,18 +327,16 @@ function FileRow({
         )}
       </div>
 
-      {/* Info */}
       <div className="flex-1 min-w-0">
         <p className="text-[12px] font-medium truncate text-foreground">{file.name}</p>
         <p className="text-[11px] text-muted-foreground mt-0.5">{formatFileSize(file.size)}</p>
       </div>
 
-      {/* Actions */}
       <div className="flex items-center gap-1">
         {previewUrl && isImage && status !== "verified" && (
           <button
             onClick={(e) => { e.stopPropagation(); onPreview() }}
-            className="w-7 h-7 rounded-md border border-white/[0.06] flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/[0.05] transition-colors"
+            className="w-7 h-7 rounded-md border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           >
             <Eye className="w-3.5 h-3.5" />
           </button>
@@ -349,7 +344,7 @@ function FileRow({
         {status !== "verified" && (
           <button
             onClick={onClear}
-            className="w-7 h-7 rounded-md border border-white/[0.06] flex items-center justify-center text-muted-foreground hover:text-[#9a5050] hover:bg-[#1a0a0a] transition-colors"
+            className="w-7 h-7 rounded-md border border-border flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -366,11 +361,11 @@ function RejectionPanel({ reason, history }: {
   return (
     <div className="space-y-2">
       {reason && (
-        <div className="flex items-start gap-2 rounded-lg bg-[#1a0a0a] border border-[#2e1414] px-3 py-2.5">
-          <AlertCircle className="w-3.5 h-3.5 text-[#9a5050] mt-0.5 shrink-0" />
+        <div className="flex items-start gap-2 rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2.5">
+          <AlertCircle className="w-3.5 h-3.5 text-destructive mt-0.5 shrink-0" />
           <div>
-            <p className="text-[11px] font-medium text-[#9a5050] mb-0.5">Raison du refus</p>
-            <p className="text-[11px] text-[#7a4040] leading-relaxed">{reason}</p>
+            <p className="text-[11px] font-medium text-destructive mb-0.5">Raison du refus</p>
+            <p className="text-[11px] text-destructive/80 leading-relaxed">{reason}</p>
           </div>
         </div>
       )}
@@ -382,13 +377,13 @@ function RejectionPanel({ reason, history }: {
           {history.map((record, i) => (
             <div key={i} className="flex items-center gap-2 text-[11px]">
               {record.status === "verified" ? (
-                <CheckCircle2 className="w-3 h-3 text-[#4a8a5a] shrink-0" />
+                <CheckCircle2 className="w-3 h-3 text-green-500 shrink-0" />
               ) : (
-                <XCircle className="w-3 h-3 text-[#9a5050] shrink-0" />
+                <XCircle className="w-3 h-3 text-destructive shrink-0" />
               )}
               <span className="text-muted-foreground">{formatDateTime(record.submittedAt)}</span>
               {record.rejectionReason && (
-                <span className="text-[#7a4040] truncate">· {record.rejectionReason}</span>
+                <span className="text-destructive/70 truncate">· {record.rejectionReason}</span>
               )}
             </div>
           ))}
@@ -401,14 +396,14 @@ function RejectionPanel({ reason, history }: {
 function PreviewModal({ url, name, onClose }: { url: string; name: string; onClose: () => void }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
       onClick={onClose}
     >
       <div
-        className="relative max-w-lg w-full mx-4 rounded-xl overflow-hidden bg-transparent border border-white/[0.08] shadow-xl"
+        className="relative max-w-lg w-full mx-4 rounded-xl overflow-hidden bg-popover border border-border shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <p className="text-xs font-medium truncate max-w-[260px] text-foreground">{name}</p>
           <button
             onClick={onClose}
@@ -417,7 +412,7 @@ function PreviewModal({ url, name, onClose }: { url: string; name: string; onClo
             <XCircle className="w-4 h-4" />
           </button>
         </div>
-        <div className="p-2 max-h-[70vh] overflow-auto flex items-center justify-center bg-white/[0.02]">
+        <div className="p-2 max-h-[70vh] overflow-auto flex items-center justify-center bg-muted/30">
           <img src={url} alt={name} className="max-w-full max-h-[65vh] object-contain rounded-lg" />
         </div>
       </div>
@@ -453,13 +448,13 @@ function DocumentCard({ doc, docState, onFileChange, onSubmit, onRetry }: Docume
       <div
         className={`
           rounded-2xl overflow-visible transition-colors duration-200
-          bg-transparent
+          bg-card
           border ${borderCls}
         `}
       >
         {/* HEADER */}
         <div className="flex items-center gap-3 px-4 pt-4 pb-3">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-white/[0.04] border border-white/[0.06]">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-muted border border-border">
             <FileText className="w-4 h-4 text-muted-foreground" />
           </div>
 
@@ -467,7 +462,7 @@ function DocumentCard({ doc, docState, onFileChange, onSubmit, onRetry }: Docume
             <p className="text-[13px] font-medium flex items-center gap-1.5 text-foreground">
               {doc.title}
               {!doc.required && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.06] text-muted-foreground font-normal">
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted border border-border text-muted-foreground font-normal">
                   optionnel
                 </span>
               )}
@@ -519,21 +514,19 @@ function DocumentCard({ doc, docState, onFileChange, onSubmit, onRetry }: Docume
             />
           )}
 
-          {/* Raison de refus + historique */}
           {(rejectionReason || history.length > 0) && (
             <RejectionPanel reason={rejectionReason} history={history} />
           )}
 
-          {/* Erreur fichier */}
           {fileError && (
-            <div className="text-[11px] text-[#9a5050] flex items-center gap-1.5">
+            <div className="text-[11px] text-destructive flex items-center gap-1.5">
               <AlertCircle className="w-3.5 h-3.5 shrink-0" />
               {fileError}
             </div>
           )}
 
           {/* ACTIONS */}
-          <div className="flex items-center gap-2 pt-2 border-t border-white/[0.05]">
+          <div className="flex items-center gap-2 pt-2 border-t border-border">
             <Button
               size="sm"
               disabled={isSubmitDisabled}
@@ -669,7 +662,7 @@ export function LegalSection() {
       {/* En-tête */}
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
-          <h3 className="text-sm font-semibold flex items-center gap-2">
+          <h3 className="text-sm font-semibold flex items-center gap-2 text-foreground">
             <ShieldCheck className="w-4 h-4" />
             Vérification du profil
           </h3>
@@ -694,7 +687,7 @@ export function LegalSection() {
             {DOCS.length} soumis
           </span>
           <span>
-            <span className="font-medium text-[#4a8a5a]">{verifiedCount}</span>{" "}
+            <span className="font-medium text-green-600 dark:text-green-400">{verifiedCount}</span>{" "}
             vérifié{verifiedCount > 1 ? "s" : ""}
           </span>
         </div>
@@ -765,7 +758,7 @@ export function LegalSection() {
       </div>
 
       {/* Confidentialité */}
-      <div className="rounded-xl border border-white/[0.05] bg-white/[0.02] p-3 text-[11px] text-muted-foreground leading-relaxed">
+      <div className="rounded-xl border border-border bg-muted/40 p-3 text-[11px] text-muted-foreground leading-relaxed">
         <p className="font-medium text-foreground mb-1">Confidentialité &amp; sécurité</p>
         <p>
           Vos documents sont chiffrés et utilisés uniquement pour la vérification
