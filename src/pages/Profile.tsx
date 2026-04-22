@@ -312,11 +312,12 @@ function ConnexionSection() {
    MENU
 ───────────────────────────────────────── */
 const menuItems = [
-  { key: "profil", label: "Profil public", icon: ImagePlus },
-  { key: "info", label: "Informations de base", icon: User },
-  { key: "connexion", label: "Connexion", icon: Lock },
-  { key: "legal", label: "Légal", icon: ShieldCheck },
-  { key: "avis", label: "Avis des utilisateurs", icon: Star },
+  { key: "profil",    label: "Profil public",          icon: ImagePlus },
+  { key: "info",      label: "Informations de base",   icon: User },
+  { key: "vehicule",  label: "Véhicule",               icon: Car },
+  { key: "connexion", label: "Connexion",              icon: Lock },
+  { key: "legal",     label: "Légal",                  icon: ShieldCheck },
+  { key: "avis",      label: "Avis des utilisateurs",  icon: Star },
 ]
 
 /* ─────────────────────────────────────────
