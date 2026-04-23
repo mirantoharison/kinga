@@ -55,6 +55,8 @@ import {
   SelectItem,
 } from "@/components/ui/select"
 import { PublicSection } from "@/components/profile/PublicSection"
+import { VehiculeSection } from "@/components/profile/VehicleSection"
+import { ReviewSection } from "@/components/profile/ReviewSection"
 
 /* ─────────────────────────────────────────
    SECTION CONNEXION
@@ -312,12 +314,12 @@ function ConnexionSection() {
    MENU
 ───────────────────────────────────────── */
 const menuItems = [
-  { key: "profil",    label: "Profil public",          icon: ImagePlus },
-  { key: "info",      label: "Informations de base",   icon: User },
-  { key: "vehicule",  label: "Véhicule",               icon: Car },
-  { key: "connexion", label: "Connexion",              icon: Lock },
-  { key: "legal",     label: "Légal",                  icon: ShieldCheck },
-  { key: "avis",      label: "Avis des utilisateurs",  icon: Star },
+  { key: "profil", label: "Profil public", icon: ImagePlus },
+  { key: "info", label: "Informations de base", icon: User },
+  { key: "connexion", label: "Connexion", icon: Lock },
+  { key: "legal", label: "Légal", icon: ShieldCheck },
+  { key: "vehicule", label: "Véhicule", icon: Car },
+  { key: "avis", label: "Avis des utilisateurs", icon: Star },
 ]
 
 /* ─────────────────────────────────────────
@@ -328,7 +330,7 @@ export default function ProfilePage() {
   const [liked, setLiked] = useState(false)
 
   return (
-    <div className="p-4 md:p-6 max-w-6xl mx-auto">
+    <div className="p-4 md:p-6 max-w-4xl mx-auto">
 
       <Card className="overflow-hidden py-0">
 
@@ -530,26 +532,13 @@ export default function ProfilePage() {
                 </>
               )}
 
+              {active === "vehicule" && <VehiculeSection />}
+
               {active === "connexion" && <ConnexionSection />}
 
               {active === "legal" && <LegalSection />}
 
-              {active === "avis" && (
-                <>
-                  <h3 className="text-sm font-semibold">Avis des utilisateurs</h3>
-                  <div className="space-y-3 text-xs">
-                    <div className="border rounded-lg p-3">
-                      <p className="font-medium">Marie</p>
-                      <p className="text-muted-foreground">Très bon conducteur, ponctuel et agréable.</p>
-                    </div>
-                    <div className="border rounded-lg p-3">
-                      <p className="font-medium">Jean</p>
-                      <p className="text-muted-foreground">Conduite fluide, très professionnel.</p>
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm" className="w-full text-xs mt-2">Voir plus d'avis</Button>
-                </>
-              )}
+              {active === "avis" && <ReviewSection />}
 
             </div>
           </div>
