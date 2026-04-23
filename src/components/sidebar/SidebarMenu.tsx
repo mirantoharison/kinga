@@ -38,8 +38,6 @@ const menus = [
   {
     label: "Mes trajets",
     items: [
-      { label: "Mes réservations", icon: Calendar, path: "/bookings" },
-      { label: "Trajets proposés", icon: Car, path: "/my-rides" },
       { label: "Historique récent", icon: History, path: "/ride/history" },
       { label: "Trajets archivés", icon: Archive, path: "/ride/archived" },
     ],
@@ -57,7 +55,6 @@ const menus = [
     label: "Paiements",
     items: [
       { label: "Mes paiements", icon: CreditCard, path: "/payments" },
-      { label: "Portefeuille", icon: Wallet, path: "/wallet" },
     ],
   },
   {
