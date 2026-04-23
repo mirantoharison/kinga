@@ -32,7 +32,7 @@ export function RideList({ rides, archived = false }: Props) {
       className={cn(
         "grid gap-4",
         // 🔥 responsive → déjà prêt pour scaling
-        "md:grid-cols-2 xl:grid-cols-3"
+        "md:grid-cols-2"
       )}
     >
       {rides.map((ride, i) => (

@@ -20,6 +20,7 @@ import RegisterPage from "@/pages/Register"
 import ListRideHistory from "./pages/ListRideHistory"
 import ArchivedRidePage from "./pages/ListRideArchived"
 import ProfilePage from "./pages/Profile"
+import DetailsRide from "./pages/DetailsRide"
 
 // Placeholder
 const Placeholder = ({ title }: { title: string }) => (
@@ -58,6 +59,7 @@ export default function App() {
       <Route path="/home" element={withAppLayout(<DashboardPage />)} />
       <Route path="/ride/search" element={withAppLayout(<ListRidePage />)} />
       <Route path="/ride/create" element={withAppLayout(<CreateRidePage />)} />
+      <Route path="/ride/details/:id" element={withAppLayout(<DetailsRide />)} />
 
       {/* Mes trajets */}
       <Route path="/bookings" element={withAppLayout(<Placeholder title="Mes réservations" />)} />

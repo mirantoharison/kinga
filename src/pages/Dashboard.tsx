@@ -181,7 +181,7 @@ export default function DashboardPage() {
   }, [])
 
   return (
-    <div className="p-6 space-y-6 max-w-6xl mx-auto">
+    <div className="p-6 space-y-6 max-w-4xl mx-auto">
 
       {/* ───────────────── HEADER ───────────────── */}
       <div className="flex items-start gap-4 p-4 rounded-2xl border bg-muted/40">
