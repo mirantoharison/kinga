@@ -253,7 +253,8 @@ function VehicleCarousel({ photos }: { photos: string[] }) {
   const [index, setIndex] = useState(0)
   return (
     <div className="space-y-2">
-      <div className="relative aspect-video rounded-xl overflow-hidden bg-muted">
+      {/* rounded-md instead of rounded-xl */}
+      <div className="relative aspect-video rounded-md overflow-hidden bg-muted">
         <img
           src={photos[index]}
           className="w-full h-full object-cover transition-all duration-300"
@@ -293,8 +294,9 @@ function VehicleCarousel({ photos }: { photos: string[] }) {
           <button
             key={i}
             onClick={() => setIndex(i)}
+            // rounded-sm instead of rounded-lg
             className={cn(
-              "aspect-video rounded-lg overflow-hidden border-2 transition",
+              "aspect-video rounded-sm overflow-hidden border-2 transition",
               i === index ? "border-primary" : "border-transparent"
             )}
           >
@@ -331,7 +333,7 @@ function RatingDistribution() {
 }
 
 /* ─────────────────────────────────────────
-   REVIEW CARD (using your ReviewCard style)
+   REVIEW CARD
 ───────────────────────────────────────── */
 function ReviewCard({ review, onToast }: {
   review: typeof REVIEWS[number]
@@ -348,7 +350,8 @@ function ReviewCard({ review, onToast }: {
   }
 
   return (
-    <div className="flex flex-col h-full border rounded-xl bg-card hover:shadow-sm transition-all overflow-hidden">
+    // rounded-lg instead of rounded-xl, border-border/50 for subtler border
+    <div className="flex flex-col h-full border border-border/50 rounded-lg bg-card hover:shadow-sm transition-all overflow-hidden">
       <div className="flex flex-col h-full px-4 py-3 space-y-3">
 
         {/* HEADER */}
@@ -359,14 +362,14 @@ function ReviewCard({ review, onToast }: {
             </div>
             <div className="flex items-center gap-1.5 flex-wrap">
               <p className="text-xs font-semibold text-foreground">{review.author}</p>
-              <Badge variant="outline" className="text-[10px] h-4 px-1.5 flex items-center gap-1">
+              <Badge variant="outline" className="text-[10px] h-4 px-1.5 flex items-center gap-1 border-border/50">
                 {review.role === "Conducteur" ? <Car className="w-2.5 h-2.5" /> : <Users className="w-2.5 h-2.5" />}
                 {review.role}
               </Badge>
               <span className="text-[10px] text-muted-foreground">{review.date}</span>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 border border-border rounded-md px-2 py-1 bg-muted/60 shrink-0">
+          <div className="flex items-center gap-1.5 border border-border/40 rounded-md px-2 py-1 bg-muted/40 shrink-0">
             <StarRow rating={review.rating} />
             <span className="text-[11px] text-foreground">{review.rating}/5</span>
           </div>
@@ -374,7 +377,7 @@ function ReviewCard({ review, onToast }: {
 
         {/* TRAJET */}
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center gap-2 text-xs bg-muted px-3 py-1.5 rounded-lg">
+          <div className="flex items-center gap-2 text-xs bg-muted/60 px-3 py-1.5 rounded-md">
             <MapPin className="w-3.5 h-3.5 text-emerald-500" />
             <span className="font-medium">{review.from}</span>
             →
@@ -386,7 +389,8 @@ function ReviewCard({ review, onToast }: {
         </div>
 
         {/* COMMENT */}
-        <div className="bg-muted/50 px-4 py-3 rounded-xl border border-border flex-1">
+        {/* rounded-md instead of rounded-xl, border-border/40 */}
+        <div className="bg-muted/40 px-4 py-3 rounded-md border border-border/40 flex-1">
           <p className="text-xs text-muted-foreground italic leading-relaxed">
             {truncateText(review.comment, 180)}
           </p>
@@ -426,7 +430,8 @@ function ReviewStatBar() {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
       {stats.map(({ label, value, icon, highlight }) => (
-        <div key={label} className="flex flex-col gap-1 p-3 rounded-xl border bg-muted/40">
+        // rounded-md, border-border/50
+        <div key={label} className="flex flex-col gap-1 p-3 rounded-md border border-border/50 bg-muted/30">
           <div className={cn("text-muted-foreground", highlight)}>{icon}</div>
           <p className={cn("text-lg font-bold leading-none", highlight)}>{value}</p>
           <p className="text-[11px] text-muted-foreground">{label}</p>
@@ -466,7 +471,6 @@ function ReviewsTab({ onToast }: { onToast: (msg: string) => void }) {
   const [page, setPage] = useState(1)
   const PER_PAGE = 4
 
-  /* Filtering */
   const filtered = REVIEWS
     .filter((r) => {
       const matchesSearch =
@@ -506,10 +510,8 @@ function ReviewsTab({ onToast }: { onToast: (msg: string) => void }) {
   return (
     <div className="space-y-4">
 
-      {/* STATS */}
       <ReviewStatBar />
 
-      {/* FILTERS */}
       <div className="space-y-3">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -517,7 +519,8 @@ function ReviewsTab({ onToast }: { onToast: (msg: string) => void }) {
             placeholder="Rechercher par trajet, utilisateur, commentaire..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-            className="pl-9 rounded-xl"
+            // rounded-md
+            className="pl-9 rounded-md"
           />
         </div>
 
@@ -528,7 +531,8 @@ function ReviewsTab({ onToast }: { onToast: (msg: string) => void }) {
                 key={f.key}
                 variant={filter === f.key ? "secondary" : "outline"}
                 size="sm"
-                className="rounded-full text-xs h-7 flex items-center"
+                // rounded-md instead of rounded-full
+                className="rounded-md text-xs h-7 flex items-center border-border/50"
                 onClick={() => { setFilter(f.key); setPage(1) }}
               >
                 {f.icon}
@@ -542,7 +546,7 @@ function ReviewsTab({ onToast }: { onToast: (msg: string) => void }) {
                 key={s.key}
                 variant={sort === s.key ? "secondary" : "ghost"}
                 size="sm"
-                className="rounded-full text-xs h-7"
+                className="rounded-md text-xs h-7"
                 onClick={() => { setSort(s.key); setPage(1) }}
               >
                 <SlidersHorizontal className="w-3 h-3 mr-1" />
@@ -553,7 +557,6 @@ function ReviewsTab({ onToast }: { onToast: (msg: string) => void }) {
         </div>
       </div>
 
-      {/* LIST — 1 per row */}
       {paginated.length > 0 ? (
         <div className="flex flex-col gap-3">
           {paginated.map((review) => (
@@ -561,8 +564,9 @@ function ReviewsTab({ onToast }: { onToast: (msg: string) => void }) {
           ))}
         </div>
       ) : (
-        <div className="py-10 text-center flex flex-col items-center border border-dashed border-border rounded-2xl py-12 px-6 bg-muted/20">
-          <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mb-4">
+        // rounded-lg, border-border/40
+        <div className="py-10 text-center flex flex-col items-center border border-dashed border-border/40 rounded-lg py-12 px-6 bg-muted/20">
+          <div className="w-14 h-14 rounded-lg bg-muted flex items-center justify-center mb-4">
             <Search className="w-6 h-6 text-muted-foreground opacity-60" />
           </div>
           <p className="text-sm font-semibold">Aucun résultat trouvé</p>
@@ -570,7 +574,7 @@ function ReviewsTab({ onToast }: { onToast: (msg: string) => void }) {
             Aucun avis ne correspond à vos critères. Réinitialisez les filtres pour voir plus de résultats.
           </p>
           <Button
-            size="sm" variant="outline" className="mt-4 text-xs"
+            size="sm" variant="outline" className="mt-4 text-xs border-border/50"
             onClick={() => { setSearch(""); setFilter("all"); setSort("recent"); setPage(1) }}
           >
             Réinitialiser les filtres
@@ -578,22 +582,21 @@ function ReviewsTab({ onToast }: { onToast: (msg: string) => void }) {
         </div>
       )}
 
-      {/* PAGINATION */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-1.5 pt-2 flex-wrap">
-          <Button variant="outline" size="sm" onClick={() => setPage(p => p - 1)} disabled={page === 1}>←</Button>
+          <Button variant="outline" size="sm" className="border-border/50" onClick={() => setPage(p => p - 1)} disabled={page === 1}>←</Button>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
             <Button
               key={p}
               size="sm"
               variant={p === page ? "default" : "outline"}
               onClick={() => setPage(p)}
-              className="min-w-[32px]"
+              className={cn("min-w-[32px]", p !== page && "border-border/50")}
             >
               {p}
             </Button>
           ))}
-          <Button variant="outline" size="sm" onClick={() => setPage(p => p + 1)} disabled={page === totalPages}>→</Button>
+          <Button variant="outline" size="sm" className="border-border/50" onClick={() => setPage(p => p + 1)} disabled={page === totalPages}>→</Button>
         </div>
       )}
     </div>
@@ -610,21 +613,21 @@ function GeneralTab() {
       {/* LEFT COLUMN */}
       <div className="space-y-4 md:col-span-1">
 
-        {/* Bio */}
-        <div className="rounded-2xl border bg-card p-4">
+        {/* Bio — rounded-lg, border-border/50 */}
+        <div className="rounded-lg border border-border/50 bg-card p-4">
           <Section title="À propos" icon={Globe}>
             <p className="text-xs text-muted-foreground leading-relaxed">{PROFILE.bio}</p>
           </Section>
         </div>
 
         {/* Languages */}
-        <div className="rounded-2xl border bg-card p-4">
+        <div className="rounded-lg border border-border/50 bg-card p-4">
           <Section title="Langues parlées" icon={Globe}>
             <div className="flex flex-wrap gap-2">
               {PROFILE.languages.map((lang) => (
                 <span
                   key={lang.code}
-                  className="flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border bg-muted/40"
+                  className="flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded border border-border/40 bg-muted/30"
                 >
                   <FlagImg country={lang.country} />
                   {lang.label}
@@ -635,13 +638,13 @@ function GeneralTab() {
         </div>
 
         {/* Preferences */}
-        <div className="rounded-2xl border bg-card p-4">
+        <div className="rounded-lg border border-border/50 bg-card p-4">
           <Section title="Préférences à bord" icon={Luggage}>
             <div className="grid grid-cols-2 gap-1.5">
               {PROFILE.preferences.map(({ key, label, icon: Icon }) => (
                 <div
                   key={key}
-                  className="flex items-center gap-2 text-[11px] px-2.5 py-1.5 rounded-lg bg-muted/40 border text-muted-foreground"
+                  className="flex items-center gap-2 text-[11px] px-2.5 py-1.5 rounded border border-border/40 bg-muted/30 text-muted-foreground"
                 >
                   <Icon className="w-3 h-3 shrink-0" />
                   {label}
@@ -653,7 +656,7 @@ function GeneralTab() {
 
         {/* Socials */}
         {(PROFILE.socials.facebook || PROFILE.socials.instagram || PROFILE.socials.website || PROFILE.socials.linkedin) && (
-          <div className="rounded-2xl border bg-card p-4">
+          <div className="rounded-lg border border-border/50 bg-card p-4">
             <Section title="Liens" icon={Link}>
               <div className="space-y-2">
                 {PROFILE.socials.facebook && (
@@ -676,11 +679,11 @@ function GeneralTab() {
 
       {/* RIGHT COLUMN — Vehicle */}
       <div className="space-y-4 md:col-span-2">
-        <div className="rounded-2xl border bg-card p-4 space-y-4">
+        <div className="rounded-lg border border-border/50 bg-card p-4 space-y-4">
           <Section title="Véhicule" icon={Car}>
 
             <VehicleCarousel photos={VEHICLE.photos} />
-            <Separator />
+            <Separator className="opacity-40" />
 
             {/* Info grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -692,11 +695,12 @@ function GeneralTab() {
                 { icon: Gauge,    label: "Kilométrage",      value: VEHICLE.mileage },
                 { icon: null,     label: "Couleur",          value: VEHICLE.color, colorDot: VEHICLE.colorHex },
               ].map(({ icon: Icon, label, value, colorDot }) => (
-                <div key={label} className="flex flex-col gap-0.5 p-2.5 rounded-xl border bg-muted/40">
+                // rounded, border-border/40
+                <div key={label} className="flex flex-col gap-0.5 p-2.5 rounded border border-border/40 bg-muted/30">
                   <p className="text-[10px] text-muted-foreground flex items-center gap-1">
                     {Icon && <Icon className="w-3 h-3 shrink-0" />}
                     {!Icon && colorDot && (
-                      <span className="w-3 h-3 rounded-full shrink-0 border border-border" style={{ backgroundColor: colorDot }} />
+                      <span className="w-3 h-3 rounded-full shrink-0 border border-border/50" style={{ backgroundColor: colorDot }} />
                     )}
                     {label}
                   </p>
@@ -705,7 +709,7 @@ function GeneralTab() {
               ))}
             </div>
 
-            <Separator />
+            <Separator className="opacity-40" />
 
             {/* Equipments */}
             <div>
@@ -714,7 +718,7 @@ function GeneralTab() {
               </p>
               <div className="flex flex-wrap gap-2">
                 {VEHICLE.equipments.map(({ key, label, icon: Icon }) => (
-                  <span key={key} className="flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border bg-muted/40 text-muted-foreground">
+                  <span key={key} className="flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded border border-border/40 bg-muted/30 text-muted-foreground">
                     <Icon className="w-3 h-3 shrink-0" />
                     {label}
                   </span>
@@ -722,11 +726,11 @@ function GeneralTab() {
               </div>
             </div>
 
-            <Separator />
+            <Separator className="opacity-40" />
 
             {/* Comfort + documents */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="flex flex-col gap-1.5 p-3 rounded-xl border bg-muted/40">
+              <div className="flex flex-col gap-1.5 p-3 rounded border border-border/40 bg-muted/30">
                 <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-medium">
                   Confort estimé
                 </p>
@@ -737,20 +741,20 @@ function GeneralTab() {
                   </span>
                 </div>
               </div>
-              <div className="flex flex-col gap-1.5 p-3 rounded-xl border bg-muted/40">
+              <div className="flex flex-col gap-1.5 p-3 rounded border border-border/40 bg-muted/30">
                 <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-medium">Documents</p>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <Wrench className="w-3 h-3 text-muted-foreground shrink-0" />
                     <span className="text-[11px]">Contrôle technique</span>
-                    <span className={cn("ml-auto text-[10px] px-1.5 py-0.5 rounded-full", VEHICLE.ctValid ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-500")}>
+                    <span className={cn("ml-auto text-[10px] px-1.5 py-0.5 rounded", VEHICLE.ctValid ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-500")}>
                       {VEHICLE.ctValid ? "Valide" : "Expiré"}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="w-3 h-3 text-muted-foreground shrink-0" />
                     <span className="text-[11px]">Assurance</span>
-                    <span className={cn("ml-auto text-[10px] px-1.5 py-0.5 rounded-full", VEHICLE.insValid ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-500")}>
+                    <span className={cn("ml-auto text-[10px] px-1.5 py-0.5 rounded", VEHICLE.insValid ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-500")}>
                       {VEHICLE.insValid ? "Valide" : "Expirée"}
                     </span>
                   </div>
@@ -761,11 +765,11 @@ function GeneralTab() {
           </Section>
         </div>
 
-        {/* Rating overview (mini) in general tab */}
-        <div className="rounded-2xl border bg-card p-4">
+        {/* Rating overview */}
+        <div className="rounded-lg border border-border/50 bg-card p-4">
           <Section title="Aperçu des avis" icon={Star}>
-            <div className="flex flex-col md:flex-row gap-4 p-3 rounded-xl bg-muted/40 border">
-              <div className="flex flex-col items-center justify-center md:border-r md:pr-4 gap-1">
+            <div className="flex flex-col md:flex-row gap-4 p-3 rounded border border-border/40 bg-muted/30">
+              <div className="flex flex-col items-center justify-center md:border-r md:border-border/40 md:pr-4 gap-1">
                 <p className="text-4xl font-bold">{PROFILE.rating}</p>
                 <StarRow rating={Math.round(PROFILE.rating)} size="lg" />
                 <p className="text-[11px] text-muted-foreground">{PROFILE.reviewCount} avis</p>
@@ -775,7 +779,6 @@ function GeneralTab() {
               </div>
             </div>
 
-            {/* 3 most recent reviews, 1 per row */}
             <div className="flex flex-col gap-3 mt-1">
               {REVIEWS.slice(0, 3).map((review) => (
                 <ReviewCard key={review.id} review={review} onToast={() => {}} />
@@ -807,14 +810,15 @@ export default function PublicProfilePage() {
 
       {/* TOAST */}
       {toast && (
-        <div className="fixed top-4 right-4 z-50 bg-foreground text-background text-xs px-4 py-2 rounded-xl shadow-lg animate-in slide-in-from-top-2">
+        <div className="fixed top-4 right-4 z-50 bg-foreground text-background text-xs px-4 py-2 rounded shadow-lg animate-in slide-in-from-top-2">
           {toast}
           <button onClick={() => setToast(null)} className="ml-3 opacity-60 hover:opacity-100">✕</button>
         </div>
       )}
 
       {/* ───── HEADER CARD ───── */}
-      <div className="rounded-2xl border bg-card overflow-hidden">
+      {/* rounded-lg instead of rounded-2xl, border-border/50 */}
+      <div className="rounded-lg border border-border/50 bg-card overflow-hidden">
 
         {/* Cover */}
         <div className="relative w-full h-44 md:h-52">
@@ -822,23 +826,23 @@ export default function PublicProfilePage() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
           <div className="absolute top-3 right-3 flex gap-2">
-            <Button size="icon" variant="outline" className="bg-background/80 backdrop-blur-sm w-8 h-8">
+            <Button size="icon" variant="outline" className="bg-background/80 backdrop-blur-sm w-8 h-8 rounded border-border/50">
               <Share2 className="w-3.5 h-3.5" />
             </Button>
             <Button
               size="icon" variant="outline"
               onClick={() => setLiked((p) => !p)}
-              className={cn("bg-background/80 backdrop-blur-sm w-8 h-8", liked && "text-rose-500 border-rose-300")}
+              className={cn("bg-background/80 backdrop-blur-sm w-8 h-8 rounded border-border/50", liked && "text-rose-500 border-rose-300")}
             >
               <Heart className="w-3.5 h-3.5" fill={liked ? "currentColor" : "none"} />
             </Button>
-            <Button size="icon" variant="outline" className="bg-background/80 backdrop-blur-sm w-8 h-8">
+            <Button size="icon" variant="outline" className="bg-background/80 backdrop-blur-sm w-8 h-8 rounded border-border/50">
               <Flag className="w-3.5 h-3.5" />
             </Button>
           </div>
 
           {PROFILE.online && (
-            <span className="absolute top-3 left-3 flex items-center gap-1.5 text-xs text-white bg-black/30 backdrop-blur-sm px-2 py-1 rounded-full">
+            <span className="absolute top-3 left-3 flex items-center gap-1.5 text-xs text-white bg-black/30 backdrop-blur-sm px-2 py-1 rounded">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               En ligne
             </span>
@@ -862,7 +866,7 @@ export default function PublicProfilePage() {
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-base md:text-lg font-semibold">{PROFILE.name}</h1>
                 {PROFILE.verified && (
-                  <Badge className="bg-emerald-50 text-emerald-600 border border-emerald-200 text-[10px]">
+                  <Badge className="bg-emerald-50 text-emerald-600 border border-emerald-200/60 text-[10px]">
                     <ShieldCheck className="w-3 h-3 mr-1" />
                     Vérifié
                   </Badge>
@@ -887,7 +891,8 @@ export default function PublicProfilePage() {
               { label: "Délai",    value: PROFILE.responseTime, sub: "de réponse",                     icon: Clock },
               { label: "Membre",   value: "2022", sub: PROFILE.memberSince,                            icon: Calendar },
             ].map(({ label, value, sub, icon: Icon }) => (
-              <div key={label} className="flex flex-col items-center text-center p-2 rounded-xl bg-muted/40 border">
+              // rounded-md, border-border/40
+              <div key={label} className="flex flex-col items-center text-center p-2 rounded-md bg-muted/30 border border-border/40">
                 <Icon className="w-3.5 h-3.5 text-muted-foreground mb-1" />
                 <p className="text-sm font-semibold leading-none">{value}</p>
                 <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight hidden md:block">{sub}</p>
@@ -898,18 +903,18 @@ export default function PublicProfilePage() {
 
           {/* CTA */}
           <div className="mt-4 flex gap-2">
-            <Button className="flex-1 gap-1.5">
+            <Button className="flex-1 gap-1.5 rounded-md">
               <MessageCircle className="w-4 h-4" />
               Contacter
             </Button>
-            <Button variant="outline" className="flex-1 gap-1.5">
+            <Button variant="outline" className="flex-1 gap-1.5 rounded-md border-border/60">
               <Car className="w-4 h-4" />
               Voir ses trajets
             </Button>
           </div>
 
           {/* TABS */}
-          <div className="flex gap-0 mt-5 border-b border-border -mx-4 md:-mx-5 px-4 md:px-5">
+          <div className="flex gap-0 mt-5 border-b border-border/40 -mx-4 md:-mx-5 px-4 md:px-5">
             {tabs.map(({ key, label, icon: Icon, count }) => (
               <button
                 key={key}
@@ -925,7 +930,7 @@ export default function PublicProfilePage() {
                 {label}
                 {count !== undefined && (
                   <span className={cn(
-                    "text-[10px] px-1.5 py-0.5 rounded-full ml-0.5",
+                    "text-[10px] px-1.5 py-0.5 rounded ml-0.5",
                     activeTab === key ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                   )}>
                     {count}
