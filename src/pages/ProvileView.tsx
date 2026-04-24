@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { Input } from "@/components/ui/input"
 import {
   Star,
   MapPin,
@@ -42,6 +43,16 @@ import {
   ArrowRight,
   Clock,
   TrendingUp,
+  Search,
+  SlidersHorizontal,
+  List,
+  CheckCircle,
+  MinusCircle,
+  XCircle,
+  BarChart2,
+  Star as StarIcon,
+  MessageSquare,
+  User,
 } from "lucide-react"
 
 /* ─────────────────────────────────────────
@@ -121,8 +132,7 @@ const REVIEWS = [
     from: "Antananarivo",
     to: "Antsirabe",
     comment: "Trajet très agréable, conducteur ponctuel et véhicule propre. Je recommande vivement !",
-    reply: "Merci beaucoup, c'était un plaisir !",
-    avatar: "https://i.pravatar.cc/40?img=5",
+    replies: ["Merci beaucoup, c'était un plaisir !"],
   },
   {
     id: 2,
@@ -133,8 +143,7 @@ const REVIEWS = [
     from: "Fianarantsoa",
     to: "Antananarivo",
     comment: "Passager respectueux et à l'heure. Trajet sans encombre, bonne communication avant le départ.",
-    reply: null,
-    avatar: "https://i.pravatar.cc/40?img=8",
+    replies: [],
   },
   {
     id: 3,
@@ -145,8 +154,7 @@ const REVIEWS = [
     from: "Antananarivo",
     to: "Mahajanga",
     comment: "Excellent conducteur, très professionnel. Véhicule confortable et climatisé, musique agréable.",
-    reply: "Super voyage, merci à vous aussi !",
-    avatar: "https://i.pravatar.cc/40?img=9",
+    replies: ["Super voyage, merci à vous aussi !"],
   },
   {
     id: 4,
@@ -157,8 +165,40 @@ const REVIEWS = [
     from: "Antananarivo",
     to: "Toliara",
     comment: "Trajet correct mais le véhicule manquait d'espace pour les bagages.",
-    reply: null,
-    avatar: "https://i.pravatar.cc/40?img=11",
+    replies: [],
+  },
+  {
+    id: 5,
+    author: "Haja T.",
+    role: "Conducteur",
+    date: "15 mars 2025",
+    rating: 5,
+    from: "Antsirabe",
+    to: "Antananarivo",
+    comment: "Excellent passager, très respectueux et ponctuel. Je recommande fortement.",
+    replies: ["Merci beaucoup, à très bientôt sur la route !"],
+  },
+  {
+    id: 6,
+    author: "Rado M.",
+    role: "Conducteur",
+    date: "10 mars 2025",
+    rating: 4,
+    from: "Moramanga",
+    to: "Antananarivo",
+    comment: "Bonne expérience globale. Quelques petites améliorations possibles sur la ponctualité.",
+    replies: [],
+  },
+  {
+    id: 7,
+    author: "Aina V.",
+    role: "Passagère",
+    date: "5 mars 2025",
+    rating: 2,
+    from: "Antananarivo",
+    to: "Fianarantsoa",
+    comment: "Retard important sans réelle communication. L'expérience était stressante.",
+    replies: ["Désolé pour ce problème, une urgence imprévue est survenue."],
   },
 ]
 
@@ -171,7 +211,7 @@ const RATING_DIST = [
 ]
 
 /* ─────────────────────────────────────────
-   SUB-COMPONENTS
+   HELPERS
 ───────────────────────────────────────── */
 function FlagImg({ country }: { country: string }) {
   return (
@@ -200,6 +240,10 @@ function StarRow({ rating, size = "sm" }: { rating: number; size?: "sm" | "lg" }
       ))}
     </div>
   )
+}
+
+function truncateText(text: string, max: number) {
+  return text.length > max ? text.slice(0, max) + "…" : text
 }
 
 /* ─────────────────────────────────────────
@@ -244,7 +288,6 @@ function VehicleCarousel({ photos }: { photos: string[] }) {
           </>
         )}
       </div>
-      {/* Thumbnails */}
       <div className="grid grid-cols-4 gap-1.5">
         {photos.map((url, i) => (
           <button
@@ -288,37 +331,107 @@ function RatingDistribution() {
 }
 
 /* ─────────────────────────────────────────
-   REVIEW CARD
+   REVIEW CARD (using your ReviewCard style)
 ───────────────────────────────────────── */
-function ReviewCard({ review }: { review: typeof REVIEWS[number] }) {
+function ReviewCard({ review, onToast }: {
+  review: typeof REVIEWS[number]
+  onToast: (msg: string) => void
+}) {
+  const [copied, setCopied] = useState(false)
+  const [localReplies, setLocalReplies] = useState(review.replies)
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(`${review.from} → ${review.to}`)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+    onToast("Trajet copié dans le presse-papiers")
+  }
+
   return (
-    <div className="border rounded-xl p-3 space-y-2.5 bg-card">
-      <div className="flex items-start gap-2.5">
-        <img src={review.avatar} className="w-8 h-8 rounded-full object-cover shrink-0" alt={review.author} />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div>
-              <p className="text-xs font-medium">{review.author}</p>
-              <p className="text-[10px] text-muted-foreground">{review.role}</p>
+    <div className="flex flex-col h-full border rounded-xl bg-card hover:shadow-sm transition-all overflow-hidden">
+      <div className="flex flex-col h-full px-4 py-3 space-y-3">
+
+        {/* HEADER */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0">
+              <span className="text-xs font-semibold text-foreground">{review.author[0]}</span>
             </div>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <p className="text-xs font-semibold text-foreground">{review.author}</p>
+              <Badge variant="outline" className="text-[10px] h-4 px-1.5 flex items-center gap-1">
+                {review.role === "Conducteur" ? <Car className="w-2.5 h-2.5" /> : <Users className="w-2.5 h-2.5" />}
+                {review.role}
+              </Badge>
+              <span className="text-[10px] text-muted-foreground">{review.date}</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 border border-border rounded-md px-2 py-1 bg-muted/60 shrink-0">
             <StarRow rating={review.rating} />
-          </div>
-          <div className="flex items-center gap-1.5 mt-1 text-[10px] text-muted-foreground flex-wrap">
-            <span>{review.from}</span>
-            <ArrowRight className="w-2.5 h-2.5 shrink-0" />
-            <span>{review.to}</span>
-            <span className="opacity-50">·</span>
-            <span>{review.date}</span>
+            <span className="text-[11px] text-foreground">{review.rating}/5</span>
           </div>
         </div>
+
+        {/* TRAJET */}
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2 text-xs bg-muted px-3 py-1.5 rounded-lg">
+            <MapPin className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="font-medium">{review.from}</span>
+            →
+            <span className="font-medium">{review.to}</span>
+          </div>
+          <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={handleCopy}>
+            {copied ? "Copié ✓" : "Copier"}
+          </Button>
+        </div>
+
+        {/* COMMENT */}
+        <div className="bg-muted/50 px-4 py-3 rounded-xl border border-border flex-1">
+          <p className="text-xs text-muted-foreground italic leading-relaxed">
+            {truncateText(review.comment, 180)}
+          </p>
+        </div>
+
+        {/* REPLIES COUNT */}
+        <div className="text-xs text-muted-foreground flex items-center gap-1">
+          <MessageCircle className="w-3.5 h-3.5" />
+          {localReplies.length} réponse{localReplies.length > 1 && "s"}
+        </div>
+
       </div>
-      <p className="text-[11px] text-muted-foreground leading-relaxed">{review.comment}</p>
-      {review.reply && (
-        <div className="pl-3 border-l-2 border-primary/30">
-          <p className="text-[10px] text-muted-foreground mb-0.5 font-medium">Réponse du conducteur</p>
-          <p className="text-[11px] text-muted-foreground leading-relaxed italic">{review.reply}</p>
+    </div>
+  )
+}
+
+/* ─────────────────────────────────────────
+   REVIEW STATS BAR
+───────────────────────────────────────── */
+function ReviewStatBar() {
+  const total = REVIEWS.length
+  const avg = total > 0
+    ? (REVIEWS.reduce((a, r) => a + r.rating, 0) / total).toFixed(1)
+    : "0"
+  const positive = total > 0
+    ? Math.round((REVIEWS.filter(r => r.rating >= 4).length / total) * 100)
+    : 0
+  const withReplies = REVIEWS.filter(r => r.replies.length > 0).length
+
+  const stats = [
+    { label: "Note moyenne", value: `${avg} / 5`, icon: <Star className="w-4 h-4" />, highlight: "text-emerald-500" },
+    { label: "Total avis",   value: total,         icon: <BarChart2 className="w-4 h-4" /> },
+    { label: "Avis positifs", value: `${positive}%`, icon: <TrendingUp className="w-4 h-4" />, highlight: "text-emerald-500" },
+    { label: "Avec réponse", value: withReplies,   icon: <MessageCircle className="w-4 h-4" /> },
+  ]
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      {stats.map(({ label, value, icon, highlight }) => (
+        <div key={label} className="flex flex-col gap-1 p-3 rounded-xl border bg-muted/40">
+          <div className={cn("text-muted-foreground", highlight)}>{icon}</div>
+          <p className={cn("text-lg font-bold leading-none", highlight)}>{value}</p>
+          <p className="text-[11px] text-muted-foreground">{label}</p>
         </div>
-      )}
+      ))}
     </div>
   )
 }
@@ -344,64 +457,386 @@ function Section({ title, icon: Icon, children, className }: {
 }
 
 /* ─────────────────────────────────────────
+   REVIEWS TAB CONTENT
+───────────────────────────────────────── */
+function ReviewsTab({ onToast }: { onToast: (msg: string) => void }) {
+  const [search, setSearch] = useState("")
+  const [filter, setFilter] = useState<"all" | "positive" | "neutral" | "negative">("all")
+  const [sort, setSort] = useState<"recent" | "rating">("recent")
+  const [page, setPage] = useState(1)
+  const PER_PAGE = 4
+
+  /* Filtering */
+  const filtered = REVIEWS
+    .filter((r) => {
+      const matchesSearch =
+        search === "" ||
+        r.author.toLowerCase().includes(search.toLowerCase()) ||
+        r.comment.toLowerCase().includes(search.toLowerCase()) ||
+        r.from.toLowerCase().includes(search.toLowerCase()) ||
+        r.to.toLowerCase().includes(search.toLowerCase())
+      const matchesFilter =
+        filter === "all" ||
+        (filter === "positive" && r.rating >= 4) ||
+        (filter === "neutral" && r.rating === 3) ||
+        (filter === "negative" && r.rating <= 2)
+      return matchesSearch && matchesFilter
+    })
+    .sort((a, b) =>
+      sort === "rating"
+        ? b.rating - a.rating
+        : new Date(b.date).getTime() - new Date(a.date).getTime()
+    )
+
+  const totalPages = Math.ceil(filtered.length / PER_PAGE)
+  const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE)
+
+  const filterBtns = [
+    { key: "all",      label: "Tous",      icon: <List className="w-3.5 h-3.5 mr-1" /> },
+    { key: "positive", label: "Positifs",  icon: <CheckCircle className="w-3.5 h-3.5 mr-1 text-emerald-500" /> },
+    { key: "neutral",  label: "Neutres",   icon: <MinusCircle className="w-3.5 h-3.5 mr-1 text-amber-500" /> },
+    { key: "negative", label: "Négatifs",  icon: <XCircle className="w-3.5 h-3.5 mr-1 text-rose-500" /> },
+  ] as const
+
+  const sortBtns = [
+    { key: "recent", label: "Récent" },
+    { key: "rating", label: "Meilleures notes" },
+  ] as const
+
+  return (
+    <div className="space-y-4">
+
+      {/* STATS */}
+      <ReviewStatBar />
+
+      {/* FILTERS */}
+      <div className="space-y-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher par trajet, utilisateur, commentaire..."
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+            className="pl-9 rounded-xl"
+          />
+        </div>
+
+        <div className="flex items-center flex-wrap gap-2">
+          <div className="flex gap-1.5 flex-wrap">
+            {filterBtns.map((f) => (
+              <Button
+                key={f.key}
+                variant={filter === f.key ? "secondary" : "outline"}
+                size="sm"
+                className="rounded-full text-xs h-7 flex items-center"
+                onClick={() => { setFilter(f.key); setPage(1) }}
+              >
+                {f.icon}
+                {f.label}
+              </Button>
+            ))}
+          </div>
+          <div className="flex gap-1.5 border-l pl-3 ml-1">
+            {sortBtns.map((s) => (
+              <Button
+                key={s.key}
+                variant={sort === s.key ? "secondary" : "ghost"}
+                size="sm"
+                className="rounded-full text-xs h-7"
+                onClick={() => { setSort(s.key); setPage(1) }}
+              >
+                <SlidersHorizontal className="w-3 h-3 mr-1" />
+                {s.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* LIST — 1 per row */}
+      {paginated.length > 0 ? (
+        <div className="flex flex-col gap-3">
+          {paginated.map((review) => (
+            <ReviewCard key={review.id} review={review} onToast={onToast} />
+          ))}
+        </div>
+      ) : (
+        <div className="py-10 text-center flex flex-col items-center border border-dashed border-border rounded-2xl py-12 px-6 bg-muted/20">
+          <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mb-4">
+            <Search className="w-6 h-6 text-muted-foreground opacity-60" />
+          </div>
+          <p className="text-sm font-semibold">Aucun résultat trouvé</p>
+          <p className="text-xs text-muted-foreground mt-1 max-w-sm leading-relaxed">
+            Aucun avis ne correspond à vos critères. Réinitialisez les filtres pour voir plus de résultats.
+          </p>
+          <Button
+            size="sm" variant="outline" className="mt-4 text-xs"
+            onClick={() => { setSearch(""); setFilter("all"); setSort("recent"); setPage(1) }}
+          >
+            Réinitialiser les filtres
+          </Button>
+        </div>
+      )}
+
+      {/* PAGINATION */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-1.5 pt-2 flex-wrap">
+          <Button variant="outline" size="sm" onClick={() => setPage(p => p - 1)} disabled={page === 1}>←</Button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+            <Button
+              key={p}
+              size="sm"
+              variant={p === page ? "default" : "outline"}
+              onClick={() => setPage(p)}
+              className="min-w-[32px]"
+            >
+              {p}
+            </Button>
+          ))}
+          <Button variant="outline" size="sm" onClick={() => setPage(p => p + 1)} disabled={page === totalPages}>→</Button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ─────────────────────────────────────────
+   GENERAL TAB CONTENT
+───────────────────────────────────────── */
+function GeneralTab() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+      {/* LEFT COLUMN */}
+      <div className="space-y-4 md:col-span-1">
+
+        {/* Bio */}
+        <div className="rounded-2xl border bg-card p-4">
+          <Section title="À propos" icon={Globe}>
+            <p className="text-xs text-muted-foreground leading-relaxed">{PROFILE.bio}</p>
+          </Section>
+        </div>
+
+        {/* Languages */}
+        <div className="rounded-2xl border bg-card p-4">
+          <Section title="Langues parlées" icon={Globe}>
+            <div className="flex flex-wrap gap-2">
+              {PROFILE.languages.map((lang) => (
+                <span
+                  key={lang.code}
+                  className="flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border bg-muted/40"
+                >
+                  <FlagImg country={lang.country} />
+                  {lang.label}
+                </span>
+              ))}
+            </div>
+          </Section>
+        </div>
+
+        {/* Preferences */}
+        <div className="rounded-2xl border bg-card p-4">
+          <Section title="Préférences à bord" icon={Luggage}>
+            <div className="grid grid-cols-2 gap-1.5">
+              {PROFILE.preferences.map(({ key, label, icon: Icon }) => (
+                <div
+                  key={key}
+                  className="flex items-center gap-2 text-[11px] px-2.5 py-1.5 rounded-lg bg-muted/40 border text-muted-foreground"
+                >
+                  <Icon className="w-3 h-3 shrink-0" />
+                  {label}
+                </div>
+              ))}
+            </div>
+          </Section>
+        </div>
+
+        {/* Socials */}
+        {(PROFILE.socials.facebook || PROFILE.socials.instagram || PROFILE.socials.website || PROFILE.socials.linkedin) && (
+          <div className="rounded-2xl border bg-card p-4">
+            <Section title="Liens" icon={Link}>
+              <div className="space-y-2">
+                {PROFILE.socials.facebook && (
+                  <a href={PROFILE.socials.facebook} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition">
+                    <Link className="w-3.5 h-3.5 shrink-0" /> Facebook
+                  </a>
+                )}
+                {PROFILE.socials.instagram && (
+                  <a href={PROFILE.socials.instagram} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition">
+                    <Link className="w-3.5 h-3.5 shrink-0" /> Instagram
+                  </a>
+                )}
+              </div>
+            </Section>
+          </div>
+        )}
+      </div>
+
+      {/* RIGHT COLUMN — Vehicle */}
+      <div className="space-y-4 md:col-span-2">
+        <div className="rounded-2xl border bg-card p-4 space-y-4">
+          <Section title="Véhicule" icon={Car}>
+
+            <VehicleCarousel photos={VEHICLE.photos} />
+            <Separator />
+
+            {/* Info grid */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              {[
+                { icon: Car,      label: "Marque / Modèle", value: `${VEHICLE.brand} ${VEHICLE.model}` },
+                { icon: Calendar, label: "Année",            value: VEHICLE.year },
+                { icon: Fuel,     label: "Carburant",        value: VEHICLE.fuel },
+                { icon: Users,    label: "Places passagers", value: `${VEHICLE.seats} places` },
+                { icon: Gauge,    label: "Kilométrage",      value: VEHICLE.mileage },
+                { icon: null,     label: "Couleur",          value: VEHICLE.color, colorDot: VEHICLE.colorHex },
+              ].map(({ icon: Icon, label, value, colorDot }) => (
+                <div key={label} className="flex flex-col gap-0.5 p-2.5 rounded-xl border bg-muted/40">
+                  <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+                    {Icon && <Icon className="w-3 h-3 shrink-0" />}
+                    {!Icon && colorDot && (
+                      <span className="w-3 h-3 rounded-full shrink-0 border border-border" style={{ backgroundColor: colorDot }} />
+                    )}
+                    {label}
+                  </p>
+                  <p className="text-xs font-medium">{value}</p>
+                </div>
+              ))}
+            </div>
+
+            <Separator />
+
+            {/* Equipments */}
+            <div>
+              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide mb-2">
+                Équipements à bord
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {VEHICLE.equipments.map(({ key, label, icon: Icon }) => (
+                  <span key={key} className="flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border bg-muted/40 text-muted-foreground">
+                    <Icon className="w-3 h-3 shrink-0" />
+                    {label}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Comfort + documents */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1.5 p-3 rounded-xl border bg-muted/40">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-medium">
+                  Confort estimé
+                </p>
+                <div className="flex items-center gap-2">
+                  <StarRow rating={VEHICLE.comfort} size="lg" />
+                  <span className="text-xs text-muted-foreground">
+                    {["", "Basique", "Correct", "Confortable", "Très confortable", "Luxueux"][VEHICLE.comfort]}
+                  </span>
+                </div>
+              </div>
+              <div className="flex flex-col gap-1.5 p-3 rounded-xl border bg-muted/40">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-medium">Documents</p>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Wrench className="w-3 h-3 text-muted-foreground shrink-0" />
+                    <span className="text-[11px]">Contrôle technique</span>
+                    <span className={cn("ml-auto text-[10px] px-1.5 py-0.5 rounded-full", VEHICLE.ctValid ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-500")}>
+                      {VEHICLE.ctValid ? "Valide" : "Expiré"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-3 h-3 text-muted-foreground shrink-0" />
+                    <span className="text-[11px]">Assurance</span>
+                    <span className={cn("ml-auto text-[10px] px-1.5 py-0.5 rounded-full", VEHICLE.insValid ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-500")}>
+                      {VEHICLE.insValid ? "Valide" : "Expirée"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </Section>
+        </div>
+
+        {/* Rating overview (mini) in general tab */}
+        <div className="rounded-2xl border bg-card p-4">
+          <Section title="Aperçu des avis" icon={Star}>
+            <div className="flex flex-col md:flex-row gap-4 p-3 rounded-xl bg-muted/40 border">
+              <div className="flex flex-col items-center justify-center md:border-r md:pr-4 gap-1">
+                <p className="text-4xl font-bold">{PROFILE.rating}</p>
+                <StarRow rating={Math.round(PROFILE.rating)} size="lg" />
+                <p className="text-[11px] text-muted-foreground">{PROFILE.reviewCount} avis</p>
+              </div>
+              <div className="flex-1">
+                <RatingDistribution />
+              </div>
+            </div>
+
+            {/* 3 most recent reviews, 1 per row */}
+            <div className="flex flex-col gap-3 mt-1">
+              {REVIEWS.slice(0, 3).map((review) => (
+                <ReviewCard key={review.id} review={review} onToast={() => {}} />
+              ))}
+            </div>
+          </Section>
+        </div>
+
+      </div>
+    </div>
+  )
+}
+
+/* ─────────────────────────────────────────
    MAIN PAGE
 ───────────────────────────────────────── */
 export default function PublicProfilePage() {
   const [liked, setLiked] = useState(false)
-  const [reviewPage, setReviewPage] = useState(0)
-  const REVIEWS_PER_PAGE = 4
-  const totalPages = Math.ceil(REVIEWS.length / REVIEWS_PER_PAGE)
-  const visibleReviews = REVIEWS.slice(
-    reviewPage * REVIEWS_PER_PAGE,
-    (reviewPage + 1) * REVIEWS_PER_PAGE
-  )
+  const [activeTab, setActiveTab] = useState<"general" | "reviews">("general")
+  const [toast, setToast] = useState<string | null>(null)
+
+  const tabs = [
+    { key: "general", label: "Informations", icon: User, count: undefined },
+    { key: "reviews", label: "Avis", icon: Star, count: PROFILE.reviewCount },
+  ] as const
 
   return (
     <div className="p-4 md:p-6 max-w-4xl mx-auto space-y-4">
+
+      {/* TOAST */}
+      {toast && (
+        <div className="fixed top-4 right-4 z-50 bg-foreground text-background text-xs px-4 py-2 rounded-xl shadow-lg animate-in slide-in-from-top-2">
+          {toast}
+          <button onClick={() => setToast(null)} className="ml-3 opacity-60 hover:opacity-100">✕</button>
+        </div>
+      )}
 
       {/* ───── HEADER CARD ───── */}
       <div className="rounded-2xl border bg-card overflow-hidden">
 
         {/* Cover */}
         <div className="relative w-full h-44 md:h-52">
-          <img
-            src={PROFILE.cover}
-            className="w-full h-full object-cover object-top"
-            alt="Couverture"
-          />
+          <img src={PROFILE.cover} className="w-full h-full object-cover object-top" alt="Couverture" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-          {/* Top-right actions */}
           <div className="absolute top-3 right-3 flex gap-2">
-            <Button
-              size="icon"
-              variant="outline"
-              className="bg-background/80 backdrop-blur-sm w-8 h-8"
-              onClick={() => {}}
-            >
+            <Button size="icon" variant="outline" className="bg-background/80 backdrop-blur-sm w-8 h-8">
               <Share2 className="w-3.5 h-3.5" />
             </Button>
             <Button
-              size="icon"
-              variant="outline"
+              size="icon" variant="outline"
               onClick={() => setLiked((p) => !p)}
-              className={cn(
-                "bg-background/80 backdrop-blur-sm w-8 h-8",
-                liked && "text-rose-500 border-rose-300"
-              )}
+              className={cn("bg-background/80 backdrop-blur-sm w-8 h-8", liked && "text-rose-500 border-rose-300")}
             >
               <Heart className="w-3.5 h-3.5" fill={liked ? "currentColor" : "none"} />
             </Button>
-            <Button
-              size="icon"
-              variant="outline"
-              className="bg-background/80 backdrop-blur-sm w-8 h-8"
-            >
+            <Button size="icon" variant="outline" className="bg-background/80 backdrop-blur-sm w-8 h-8">
               <Flag className="w-3.5 h-3.5" />
             </Button>
           </div>
 
-          {/* Online badge */}
           {PROFILE.online && (
             <span className="absolute top-3 left-3 flex items-center gap-1.5 text-xs text-white bg-black/30 backdrop-blur-sm px-2 py-1 rounded-full">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -411,7 +846,7 @@ export default function PublicProfilePage() {
         </div>
 
         {/* Avatar + identity */}
-        <div className="px-4 md:px-5 pb-4">
+        <div className="px-4 md:px-5 pb-0">
           <div className="flex items-end gap-3 -mt-10">
             <div className="relative shrink-0">
               <img
@@ -436,10 +871,7 @@ export default function PublicProfilePage() {
               <div className="flex items-center gap-2 mt-0.5 flex-wrap text-xs text-muted-foreground">
                 <span>{PROFILE.pseudo}</span>
                 <span className="opacity-40">·</span>
-                <span className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3 shrink-0" />
-                  {PROFILE.location}
-                </span>
+                <span className="flex items-center gap-1"><MapPin className="w-3 h-3 shrink-0" />{PROFILE.location}</span>
                 <span className="opacity-40">·</span>
                 <span>{PROFILE.role}</span>
               </div>
@@ -449,16 +881,13 @@ export default function PublicProfilePage() {
           {/* Stats row */}
           <div className="mt-4 grid grid-cols-3 gap-2 md:grid-cols-5 md:gap-3">
             {[
-              { label: "Note", value: PROFILE.rating.toString(), sub: `${PROFILE.reviewCount} avis`, icon: Star },
-              { label: "Trajets", value: PROFILE.tripsCount.toString(), sub: "effectués", icon: Car },
-              { label: "Réponse", value: `${PROFILE.responseRate}%`, sub: "de taux", icon: TrendingUp },
-              { label: "Délai", value: PROFILE.responseTime, sub: "de réponse", icon: Clock },
-              { label: "Membre", value: "2022", sub: PROFILE.memberSince, icon: Calendar },
+              { label: "Note",     value: PROFILE.rating.toString(), sub: `${PROFILE.reviewCount} avis`, icon: Star },
+              { label: "Trajets",  value: PROFILE.tripsCount.toString(), sub: "effectués",              icon: Car },
+              { label: "Réponse", value: `${PROFILE.responseRate}%`, sub: "de taux",                   icon: TrendingUp },
+              { label: "Délai",    value: PROFILE.responseTime, sub: "de réponse",                     icon: Clock },
+              { label: "Membre",   value: "2022", sub: PROFILE.memberSince,                            icon: Calendar },
             ].map(({ label, value, sub, icon: Icon }) => (
-              <div
-                key={label}
-                className="flex flex-col items-center text-center p-2 rounded-xl bg-muted/40 border"
-              >
+              <div key={label} className="flex flex-col items-center text-center p-2 rounded-xl bg-muted/40 border">
                 <Icon className="w-3.5 h-3.5 text-muted-foreground mb-1" />
                 <p className="text-sm font-semibold leading-none">{value}</p>
                 <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight hidden md:block">{sub}</p>
@@ -478,288 +907,40 @@ export default function PublicProfilePage() {
               Voir ses trajets
             </Button>
           </div>
+
+          {/* TABS */}
+          <div className="flex gap-0 mt-5 border-b border-border -mx-4 md:-mx-5 px-4 md:px-5">
+            {tabs.map(({ key, label, icon: Icon, count }) => (
+              <button
+                key={key}
+                onClick={() => setActiveTab(key)}
+                className={cn(
+                  "flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors",
+                  activeTab === key
+                    ? "border-primary text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {label}
+                {count !== undefined && (
+                  <span className={cn(
+                    "text-[10px] px-1.5 py-0.5 rounded-full ml-0.5",
+                    activeTab === key ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                  )}>
+                    {count}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* ───── BODY : 2-col on desktop ───── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* ───── TAB CONTENT ───── */}
+      {activeTab === "general" && <GeneralTab />}
+      {activeTab === "reviews" && <ReviewsTab onToast={setToast} />}
 
-        {/* LEFT COLUMN */}
-        <div className="space-y-4 md:col-span-1">
-
-          {/* Bio */}
-          <div className="rounded-2xl border bg-card p-4">
-            <Section title="À propos" icon={Globe}>
-              <p className="text-xs text-muted-foreground leading-relaxed">{PROFILE.bio}</p>
-            </Section>
-          </div>
-
-          {/* Languages */}
-          <div className="rounded-2xl border bg-card p-4">
-            <Section title="Langues parlées" icon={Globe}>
-              <div className="flex flex-wrap gap-2">
-                {PROFILE.languages.map((lang) => (
-                  <span
-                    key={lang.code}
-                    className="flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border bg-muted/40"
-                  >
-                    <FlagImg country={lang.country} />
-                    {lang.label}
-                  </span>
-                ))}
-              </div>
-            </Section>
-          </div>
-
-          {/* Preferences */}
-          <div className="rounded-2xl border bg-card p-4">
-            <Section title="Préférences à bord" icon={Luggage}>
-              <div className="grid grid-cols-2 gap-1.5">
-                {PROFILE.preferences.map(({ key, label, icon: Icon }) => (
-                  <div
-                    key={key}
-                    className="flex items-center gap-2 text-[11px] px-2.5 py-1.5 rounded-lg bg-muted/40 border text-muted-foreground"
-                  >
-                    <Icon className="w-3 h-3 shrink-0" />
-                    {label}
-                  </div>
-                ))}
-              </div>
-            </Section>
-          </div>
-
-          {/* Socials */}
-          {(PROFILE.socials.facebook || PROFILE.socials.instagram || PROFILE.socials.website || PROFILE.socials.linkedin) && (
-            <div className="rounded-2xl border bg-card p-4">
-              <Section title="Liens" icon={Link}>
-                <div className="space-y-2">
-                  {PROFILE.socials.facebook && (
-                    <a
-                      href={PROFILE.socials.facebook}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition"
-                    >
-                      <Link className="w-3.5 h-3.5 shrink-0" />
-                      Facebook
-                    </a>
-                  )}
-                  {PROFILE.socials.instagram && (
-                    <a
-                      href={PROFILE.socials.instagram}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition"
-                    >
-                      <Link className="w-3.5 h-3.5 shrink-0" />
-                      Instagram
-                    </a>
-                  )}
-                  {PROFILE.socials.linkedin && (
-                    <a
-                      href={PROFILE.socials.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition"
-                    >
-                      <Link className="w-3.5 h-3.5 shrink-0" />
-                      LinkedIn
-                    </a>
-                  )}
-                  {PROFILE.socials.website && (
-                    <a
-                      href={PROFILE.socials.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition"
-                    >
-                      <Globe className="w-3.5 h-3.5 shrink-0" />
-                      Site web
-                    </a>
-                  )}
-                </div>
-              </Section>
-            </div>
-          )}
-
-        </div>
-
-        {/* RIGHT COLUMN */}
-        <div className="space-y-4 md:col-span-2">
-
-          {/* Vehicle */}
-          <div className="rounded-2xl border bg-card p-4 space-y-4">
-            <Section title="Véhicule" icon={Car}>
-
-              {/* Photos */}
-              <VehicleCarousel photos={VEHICLE.photos} />
-
-              <Separator />
-
-              {/* Info grid */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {[
-                  { icon: Car,       label: "Marque / Modèle", value: `${VEHICLE.brand} ${VEHICLE.model}` },
-                  { icon: Calendar,  label: "Année",            value: VEHICLE.year },
-                  { icon: Fuel,      label: "Carburant",        value: VEHICLE.fuel },
-                  { icon: Users,     label: "Places passagers", value: `${VEHICLE.seats} places` },
-                  { icon: Gauge,     label: "Kilométrage",      value: VEHICLE.mileage },
-                  {
-                    icon: null,
-                    label: "Couleur",
-                    value: VEHICLE.color,
-                    colorDot: VEHICLE.colorHex,
-                  },
-                ].map(({ icon: Icon, label, value, colorDot }) => (
-                  <div key={label} className="flex flex-col gap-0.5 p-2.5 rounded-xl border bg-muted/40">
-                    <p className="text-[10px] text-muted-foreground flex items-center gap-1">
-                      {Icon && <Icon className="w-3 h-3 shrink-0" />}
-                      {!Icon && colorDot && (
-                        <span
-                          className="w-3 h-3 rounded-full shrink-0 border border-border"
-                          style={{ backgroundColor: colorDot }}
-                        />
-                      )}
-                      {label}
-                    </p>
-                    <p className="text-xs font-medium">{value}</p>
-                  </div>
-                ))}
-              </div>
-
-              <Separator />
-
-              {/* Equipments */}
-              <div>
-                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide mb-2">
-                  Équipements à bord
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {VEHICLE.equipments.map(({ key, label, icon: Icon }) => (
-                    <span
-                      key={key}
-                      className="flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border bg-muted/40 text-muted-foreground"
-                    >
-                      <Icon className="w-3 h-3 shrink-0" />
-                      {label}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Comfort + documents */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-
-                {/* Comfort */}
-                <div className="flex flex-col gap-1.5 p-3 rounded-xl border bg-muted/40">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-medium">
-                    Confort estimé
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <StarRow rating={VEHICLE.comfort} size="lg" />
-                    <span className="text-xs text-muted-foreground">
-                      {["", "Basique", "Correct", "Confortable", "Très confortable", "Luxueux"][VEHICLE.comfort]}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Documents */}
-                <div className="flex flex-col gap-1.5 p-3 rounded-xl border bg-muted/40">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide font-medium">
-                    Documents
-                  </p>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <Wrench className="w-3 h-3 text-muted-foreground shrink-0" />
-                      <span className="text-[11px]">Contrôle technique</span>
-                      <span
-                        className={cn(
-                          "ml-auto text-[10px] px-1.5 py-0.5 rounded-full",
-                          VEHICLE.ctValid
-                            ? "bg-emerald-50 text-emerald-600"
-                            : "bg-rose-50 text-rose-500"
-                        )}
-                      >
-                        {VEHICLE.ctValid ? "Valide" : "Expiré"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck className="w-3 h-3 text-muted-foreground shrink-0" />
-                      <span className="text-[11px]">Assurance</span>
-                      <span
-                        className={cn(
-                          "ml-auto text-[10px] px-1.5 py-0.5 rounded-full",
-                          VEHICLE.insValid
-                            ? "bg-emerald-50 text-emerald-600"
-                            : "bg-rose-50 text-rose-500"
-                        )}
-                      >
-                        {VEHICLE.insValid ? "Valide" : "Expirée"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Section>
-          </div>
-
-          {/* Reviews */}
-          <div className="rounded-2xl border bg-card p-4 space-y-4">
-            <Section title="Avis et évaluations" icon={Star}>
-
-              {/* Rating overview */}
-              <div className="flex flex-col md:flex-row gap-4 p-3 rounded-xl bg-muted/40 border">
-                <div className="flex flex-col items-center justify-center md:border-r md:pr-4 gap-1">
-                  <p className="text-4xl font-bold">{PROFILE.rating}</p>
-                  <StarRow rating={Math.round(PROFILE.rating)} size="lg" />
-                  <p className="text-[11px] text-muted-foreground">{PROFILE.reviewCount} avis</p>
-                </div>
-                <div className="flex-1">
-                  <RatingDistribution />
-                </div>
-              </div>
-
-              {/* Review list */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {visibleReviews.map((review) => (
-                  <ReviewCard key={review.id} review={review} />
-                ))}
-              </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="w-7 h-7"
-                    disabled={reviewPage === 0}
-                    onClick={() => setReviewPage((p) => p - 1)}
-                  >
-                    <ChevronLeft className="w-3.5 h-3.5" />
-                  </Button>
-                  <span className="text-xs text-muted-foreground">
-                    {reviewPage + 1} / {totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="w-7 h-7"
-                    disabled={reviewPage === totalPages - 1}
-                    onClick={() => setReviewPage((p) => p + 1)}
-                  >
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </Button>
-                </div>
-              )}
-
-            </Section>
-          </div>
-
-        </div>
-      </div>
     </div>
   )
 }
