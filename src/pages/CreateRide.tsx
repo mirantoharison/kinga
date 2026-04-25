@@ -287,7 +287,8 @@ export default function CreateRidePage() {
 
               {/* TAB 2 — DÉTAILS */}
               {activeTab === "details" && (
-                <div className="space-y-6 border border-border rounded-md p-4 bg-card/80">
+                <div className="space-y-6 border border-border rounded-lg p-5 bg-card">
+
                   {/* HEADER */}
                   <TabHeader
                     icon={Settings}
@@ -307,11 +308,11 @@ export default function CreateRidePage() {
 
                     {/* HEADER */}
                     <div className="space-y-1">
-                      <p className="text-xs font-medium text-zinc-300 flex items-center gap-1.5">
+                      <p className="text-xs font-medium text-foreground flex items-center gap-1.5">
                         <MapPin className="w-3.5 h-3.5 text-emerald-500" />
                         Arrêts possibles
                       </p>
-                      <p className="text-[11px] text-zinc-500">
+                      <p className="text-[11px] text-muted-foreground">
                         Ajoutez des localités intermédiaires pour augmenter vos chances de trouver un conducteur.
                       </p>
                     </div>
@@ -321,21 +322,21 @@ export default function CreateRidePage() {
 
                       {/* input */}
                       <div className="relative">
-                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                         <input
                           value={query}
                           onChange={(e) => setQuery(e.target.value)}
                           placeholder="Rechercher une ville, quartier..."
-                          className="w-full text-xs pl-8 pr-3 py-2 rounded-md bg-zinc-900 border border-zinc-800 outline-none placeholder:text-zinc-500"
+                          className="w-full text-xs pl-8 pr-3 py-2 rounded-md bg-background border border-border outline-none placeholder:text-muted-foreground"
                         />
                       </div>
 
                       {/* RESULTS */}
                       {query.length >= 3 && (
-                        <div className="absolute z-10 mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-md max-h-48 overflow-auto shadow-lg">
+                        <div className="absolute z-10 mt-1 w-full bg-popover border border-border rounded-md max-h-48 overflow-auto shadow-lg">
 
                           {loading && (
-                            <div className="p-2 text-xs text-zinc-500 flex items-center gap-2">
+                            <div className="p-2 text-xs text-muted-foreground flex items-center gap-2">
                               <Loader2 className="w-3 h-3 animate-spin" />
                               Recherche...
                             </div>
@@ -345,17 +346,17 @@ export default function CreateRidePage() {
                             <button
                               key={i}
                               onClick={() => handleAddStop(item)}
-                              className="w-full text-left px-3 py-2 text-xs hover:bg-zinc-800 transition flex items-center gap-2"
+                              className="w-full text-left px-3 py-2 text-xs hover:bg-muted transition flex items-center gap-2"
                             >
                               <MapPin className="w-3.5 h-3.5 text-emerald-500" />
-                              <span className="truncate">{item.label}</span>
+                              <span className="truncate text-foreground">{item.label}</span>
 
-                              <Plus className="w-3.5 h-3.5 ml-auto text-zinc-500" />
+                              <Plus className="w-3.5 h-3.5 ml-auto text-muted-foreground" />
                             </button>
                           ))}
 
                           {!loading && results.length === 0 && (
-                            <div className="p-2 text-xs text-zinc-500">
+                            <div className="p-2 text-xs text-muted-foreground">
                               Aucun résultat
                             </div>
                           )}
@@ -369,25 +370,20 @@ export default function CreateRidePage() {
                         {stops.map((stop, i) => (
                           <div
                             key={i}
-                            className="group flex items-center justify-between rounded-md border border-zinc-800 bg-zinc-900/40 px-3 py-2 transition hover:border-zinc-700 hover:bg-zinc-900/60"
+                            className="group flex items-center justify-between rounded-md border border-border bg-muted/50 px-3 py-2 transition hover:bg-muted"
                           >
                             {/* LEFT */}
                             <div className="flex items-center gap-2 min-w-0">
-                              <Globe className="w-3.5 h-3.5 text-zinc-400 flex-shrink-0" />
-                              <span className="text-xs text-zinc-300 truncate">
+                              <Globe className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                              <span className="text-xs text-foreground truncate">
                                 {stop.label}
                               </span>
                             </div>
 
-                            {/* RIGHT (hover only) */}
+                            {/* RIGHT */}
                             <button
                               onClick={() => handleRemoveStop(i)}
-                              className="
-            opacity-0 group-hover:opacity-100
-            transition-opacity duration-150
-            flex items-center gap-1 text-[11px]
-            text-zinc-500 hover:text-red-400
-          "
+                              className="opacity-0 group-hover:opacity-100 transition text-[11px] text-muted-foreground hover:text-destructive flex items-center gap-1"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                               Supprimer
@@ -398,8 +394,8 @@ export default function CreateRidePage() {
                     )}
 
                     {/* INFO */}
-                    <p className="text-[11px] text-zinc-500 flex items-start gap-1.5">
-                      <MapPin className="w-3 h-3 mt-[2px] text-zinc-500 flex-shrink-0" />
+                    <p className="text-[11px] text-muted-foreground flex items-start gap-1.5">
+                      <MapPin className="w-3 h-3 mt-[2px] text-muted-foreground flex-shrink-0" />
                       Ces arrêts permettent aux conducteurs de proposer des trajets partiels compatibles avec votre itinéraire.
                     </p>
 
@@ -407,37 +403,32 @@ export default function CreateRidePage() {
 
                   {/* BUDGET */}
                   {!routeInfo.distance ? (
-                    <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-4 space-y-2">
+                    <div className="rounded-lg border border-border bg-muted/50 p-4 space-y-2">
 
-                      <p className="text-xs font-medium text-zinc-300">
+                      <p className="text-xs font-medium text-foreground">
                         Estimation du prix
                       </p>
 
-                      <p className="text-[11px] text-zinc-500 leading-relaxed">
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">
                         Le prix estimatif de votre trajet n’est pas encore disponible, car l’itinéraire n’a pas été défini.
                         Pour calculer une estimation fiable, il est nécessaire de renseigner à la fois un point de départ et une destination.
                       </p>
 
-                      <p className="text-[11px] text-zinc-500 leading-relaxed">
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">
                         Une fois ces deux points sélectionnés, la plateforme calcule automatiquement la distance et la durée du trajet,
-                        puis propose un prix indicatif basé sur ces éléments. Cette estimation vous aide à fixer un budget cohérent
-                        et à faciliter la mise en relation avec les conducteurs.
-                      </p>
-
-                      <p className="text-[11px] text-zinc-500 leading-relaxed">
-                        Vous pouvez définir votre itinéraire en utilisant la recherche d’adresse ou en sélectionnant directement les points sur la carte.
+                        puis propose un prix indicatif basé sur ces éléments.
                       </p>
 
                     </div>
                   ) : (
-                    <div className="rounded-lg bg-zinc-800/50 p-3 border border-zinc-700">
-                      <p className="text-xs text-zinc-400">
+                    <div className="rounded-lg bg-muted p-3 border border-border">
+                      <p className="text-xs text-muted-foreground">
                         Budget suggéré
                       </p>
-                      <p className="text-sm font-semibold text-emerald-400">
+                      <p className="text-sm font-semibold text-emerald-600">
                         {estimatedPrice.toLocaleString()} Ar
                       </p>
-                      <p className="text-[11px] text-zinc-500">
+                      <p className="text-[11px] text-muted-foreground">
                         Estimation basée sur la distance du trajet
                       </p>
                     </div>
