@@ -138,11 +138,11 @@ export default function CreateRidePage() {
   /* ─── UI ─── */
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-zinc-950 text-zinc-100">
+      <div className="min-h-screen bg-background text-foreground">
         <div className="p-6 max-w-3xl mx-auto space-y-6">
 
           {/* ── HEADER ── */}
-          <div className="flex items-start gap-4 p-5 rounded-2xl bg-zinc-900 border border-zinc-800">
+          <div className="flex items-start gap-4 p-5 rounded-2xl bg-card border border-border">
             <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 mt-0.5">
               <Car className="w-5 h-5 text-emerald-500" />
             </div>
@@ -219,7 +219,7 @@ export default function CreateRidePage() {
             </div>
 
             {/* Tab bar */}
-            <div className="flex items-center border-b border-zinc-800 pt-1 gap-6">
+            <div className="flex items-center border-b border-border pt-1 gap-6">
               {TABS.map((tab) => {
                 const Icon = tab.icon
                 const isActive = activeTab === tab.key
@@ -228,25 +228,25 @@ export default function CreateRidePage() {
                     key={tab.key}
                     onClick={() => setActiveTab(tab.key)}
                     className={`
-                      relative flex items-center gap-1.5 py-3 text-xs font-medium
-                      transition-colors duration-150 rounded-t-lg
-                      ${isActive
-                        ? "text-zinc-100"
-                        : "text-zinc-500 hover:text-zinc-300"
+  relative flex items-center gap-1.5 py-3 text-xs font-medium
+  transition-colors duration-150 rounded-t-lg
+  ${isActive
+                        ? "text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
                       }
-                    `}
+`}
                   >
                     <Icon className="w-3.5 h-3.5" />
                     {tab.label}
                     {"count" in tab && tab.count !== null && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-zinc-800 text-zinc-400 border border-zinc-700">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-muted text-muted-foreground border border-border">
                         {tab.count}
                       </span>
                     )}
                     {/* active indicator */}
                     <span
                       className={`
-                        absolute left-0 right-0 -bottom-px h-[2px] rounded-full transition-all
+                        absolute left-0 right-0 -bottom-px h-[2px] rounded-full transition-all z-[10]
                         ${isActive ? "bg-emerald-500" : "bg-transparent"}
                       `}
                     />
@@ -260,7 +260,7 @@ export default function CreateRidePage() {
 
               {/* TAB 1 — ITINÉRAIRE */}
               {activeTab === "route" && (
-                <div className="space-y-6 border border-zinc-800 rounded-md p-4 bg-zinc-900/40">
+                <div className="space-y-6 rounded-lg border border-border bg-card p-5">
                   <LocationSection
                     from={form.from}
                     to={form.to}
@@ -268,6 +268,7 @@ export default function CreateRidePage() {
                     setSelecting={setSelecting}
                     onSearchSelectHandler={handleSearchSelect}
                   />
+
                   <MapSection
                     selecting={selecting}
                     fromCoords={fromCoords}
@@ -275,6 +276,7 @@ export default function CreateRidePage() {
                     onSelect={handleMapSelect}
                     setRouteInfo={setRouteInfo}
                   />
+
                   <RouteSummary
                     distance={routeInfo.distance}
                     duration={routeInfo.duration}
@@ -285,7 +287,7 @@ export default function CreateRidePage() {
 
               {/* TAB 2 — DÉTAILS */}
               {activeTab === "details" && (
-                <div className="space-y-6 border border-zinc-800 rounded-md p-4 bg-zinc-900/40">
+                <div className="space-y-6 border border-border rounded-md p-4 bg-card/80">
                   {/* HEADER */}
                   <TabHeader
                     icon={Settings}
@@ -446,7 +448,7 @@ export default function CreateRidePage() {
 
               {/* TAB 3 — DESCRIPTION */}
               {activeTab === "description" && (
-                <div className="space-y-6 border border-zinc-800 rounded-md p-4 bg-zinc-900/40">
+                <div className="space-y-6 border border-border rounded-md p-4 bg-card/80">
 
                   {/* HEADER */}
                   <TabHeader
@@ -513,7 +515,7 @@ export default function CreateRidePage() {
 
               {/* TAB 4 — FICHIERS */}
               {activeTab === "files" && (
-                <div className="space-y-6 border border-zinc-800 rounded-md p-4 bg-zinc-900/40">
+                <div className="space-y-6 border border-border rounded-md p-4 bg-card/80">
 
                   {/* HEADER */}
                   <div className="space-y-2">
