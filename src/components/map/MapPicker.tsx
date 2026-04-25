@@ -1,79 +1,155 @@
 "use client"
 
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet"
-import { useEffect, useState } from "react"
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMapEvents,
+  useMap,
+} from "react-leaflet"
+import { useEffect, useMemo, useState } from "react"
 
 import { RoutePreview } from "./RoutePreview"
 import { startIcon, endIcon } from "./MapPins"
-
-// 👉 contrôles de MapView
 import { MapOverlayControls, TILE_LAYERS } from "@/components/map/MapControl"
 
 type LatLngTuple = [number, number]
 
-function ClickHandler({ onSelect }: { onSelect: (lat: number, lng: number) => void }) {
-  const [position, setPosition] = useState<LatLngTuple | null>(null)
+type Stop = {
+  label: string
+  lat: number
+  lng: number
+}
 
+/* ───────── CLICK HANDLER ───────── */
+
+function ClickHandler({
+  onSelect,
+}: {
+  onSelect: (lat: number, lng: number) => void
+}) {
   useMapEvents({
     click(e) {
       const { lat, lng } = e.latlng
-      const coords: LatLngTuple = [lat, lng]
-
-      setPosition(coords)
       onSelect(lat, lng)
     },
   })
 
-  return position ? <Marker position={position} /> : null
+  return null
 }
+
+/* ───────── MAP CENTER ───────── */
+
+function MapCenter({
+  points,
+}: {
+  points: LatLngTuple[]
+}) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (!points.length) return
+
+    if (points.length === 1) {
+      map.setView(points[0], 13, { animate: true })
+      return
+    }
+
+    const bounds = points
+    map.fitBounds(bounds, { padding: [40, 40] })
+  }, [points])
+
+  return null
+}
+
+/* ───────── MAIN ───────── */
 
 interface Props {
   from: LatLngTuple | null
   to: LatLngTuple | null
+  stops?: Stop[]
+
   onSelect: (lat: number, lng: number) => void
   onRouteData?: (data: { distance: number; duration: number }) => void
 }
 
-export function MapPicker({ from, to, onSelect, onRouteData }: Props) {
+export function MapPicker({
+  from,
+  to,
+  stops = [],
+  onSelect,
+  onRouteData,
+}: Props) {
   const [tracking, setTracking] = useState(false)
-  const [tileKey, setTileKey] = useState<keyof typeof TILE_LAYERS>("standard")
+  const [tileKey, setTileKey] =
+    useState<keyof typeof TILE_LAYERS>("standard")
 
   const tile = TILE_LAYERS[tileKey]
 
-  // 👉 centre intelligent
-  const center: LatLngTuple = from || to || [-18.8792, 47.5079]
+  /* ─── POINTS COMBINÉS ─── */
+
+  const allPoints = useMemo<LatLngTuple[]>(() => {
+    const pts: LatLngTuple[] = []
+
+    if (from) pts.push(from)
+    stops.forEach((s) => pts.push([s.lat, s.lng]))
+    if (to) pts.push(to)
+
+    return pts
+  }, [from, to, stops])
+
+  /* ─── CENTRE ─── */
+
+  const center: LatLngTuple =
+    from || to || (stops[0] ? [stops[0].lat, stops[0].lng] : [-18.8792, 47.5079])
 
   return (
     <div className="relative h-full w-full">
-
       <MapContainer
         center={center}
         zoom={13}
-        zoomControl={false} // ❗ important pour utiliser tes controls custom
+        zoomControl={false}
         style={{ height: "100%", width: "100%" }}
       >
-        {/* Tile dynamique */}
+        {/* TILE */}
         <TileLayer
           key={tileKey}
           attribution={tile.attribution}
           url={tile.url}
         />
 
-        {/* Pins */}
+        {/* AUTO CENTER */}
+        <MapCenter points={allPoints} />
+
+        {/* ─── MARKERS ─── */}
+
         {from && <Marker position={from} icon={startIcon} />}
+
+        {stops.map((stop, i) => (
+          <Marker
+            key={`stop-${i}`}
+            position={[stop.lat, stop.lng]}
+            // 👉 tu peux créer un stopIcon numéroté plus tard
+          />
+        ))}
+
         {to && <Marker position={to} icon={endIcon} />}
 
-        {/* Route */}
+        {/* ─── ROUTE ─── */}
+
         <RoutePreview
           from={from}
           to={to}
+          stops={stops} // 🔥 NOUVEAU
           onData={onRouteData}
         />
 
-        {/* Click */}
+        {/* ─── CLICK ─── */}
+
         <ClickHandler onSelect={onSelect} />
 
-        {/* 🔥 Controls réutilisés */}
+        {/* ─── CONTROLS ─── */}
+
         <MapOverlayControls
           lat={center[0]}
           lng={center[1]}
@@ -82,29 +158,7 @@ export function MapPicker({ from, to, onSelect, onRouteData }: Props) {
           onToggleTracking={() => setTracking((t) => !t)}
           onChangeTile={setTileKey}
         />
-
       </MapContainer>
-
     </div>
   )
-}
-
-function MapCenter({
-  from,
-  to,
-}: {
-  from: [number, number] | null
-  to: [number, number] | null
-}) {
-  const map = useMap()
-
-  useEffect(() => {
-    if (to) {
-      map.setView(to, 13, { animate: true })
-    } else if (from) {
-      map.setView(from, 13, { animate: true })
-    }
-  }, [from, to])
-
-  return null
 }

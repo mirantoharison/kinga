@@ -1,16 +1,13 @@
 "use client"
 
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useRef, useState, useEffect } from "react"
 import {
   Copy, CheckCheck, MapPin, Building2, Home, Globe,
   Loader2, X, LocateFixed, Navigation, Check,
-  ArrowRight, MousePointerClick, Info,
+  ArrowRight, MousePointerClick,
 } from "lucide-react"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Command, CommandList, CommandItem } from "@/components/ui/command"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useLocationSearch, type SearchResult } from "@/hooks/use-geolocation-search"
 import { useCoordDisplay } from "@/hooks/use-coord-display"
@@ -22,7 +19,7 @@ import {
   buildFullLabel,
 } from "@/lib/locationUtils"
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+/* ─── Types ──────────────────────────────────────────────────────────────────── */
 
 export interface LocationFieldProps {
   label: string
@@ -37,19 +34,29 @@ export interface LocationFieldProps {
   onSearchSelectHandler: (lat: number, lng: number, label: string) => void
 }
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+/* ─── Constants ──────────────────────────────────────────────────────────────── */
 
 const LOCATION_ICONS = {
-  city: Building2,
+  city:     Building2,
   locality: MapPin,
-  house: Home,
-  other: Globe,
+  house:    Home,
+  other:    Globe,
 } satisfies Record<string, React.ElementType>
+
+const LOCATION_LABELS: Record<string, string> = {
+  city:     "Ville",
+  locality: "Localité",
+  house:    "Adresse",
+  other:    "Lieu",
+}
 
 const getLocationIcon = (type: string): React.ElementType =>
   (LOCATION_ICONS as Record<string, React.ElementType>)[type] ?? MapPin
 
-// ─── Component ───────────────────────────────────────────────────────────────
+const getLocationLabel = (type: string): string =>
+  LOCATION_LABELS[type] ?? "Lieu"
+
+/* ─── Composant ──────────────────────────────────────────────────────────────── */
 
 export function LocationField({
   label, value, placeholder, active, done,
@@ -58,14 +65,27 @@ export function LocationField({
   const { address, setAddress, coords, setCoords } = useCoordDisplay(value)
   const { query, setQuery, results, loading, reset } = useLocationSearch()
   const [copied, setCopied] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
-  const [focused, setFocused] = useState(false)
+  const [open, setOpen]     = useState(false)
 
-  const popoverOpen = isOpen && query.length >= MIN_QUERY_LENGTH
+  // Ref sur le conteneur input + dropdown
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // Fermeture au clic en dehors du conteneur
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleOutsideClick)
+    return () => document.removeEventListener("mousedown", handleOutsideClick)
+  }, [])
+
+  const showDropdown = open && query.length >= MIN_QUERY_LENGTH
 
   const handleQueryChange = useCallback((val: string) => {
     setQuery(val)
-    setIsOpen(val.length >= MIN_QUERY_LENGTH)
+    if (val.length >= MIN_QUERY_LENGTH) setOpen(true)
   }, [setQuery])
 
   const handleSelectResult = useCallback((item: SearchResult) => {
@@ -73,15 +93,16 @@ export function LocationField({
     setCoords(formatCoords(item.lat, item.lng))
     onSearchSelectHandler(item.lat, item.lng, buildFullLabel(item.label, item.lat, item.lng))
     reset()
-    setIsOpen(false)
-  }, [onSearchSelectHandler, setAddress, setCoords, reset])
+    setQuery("")
+    setOpen(false)
+  }, [onSearchSelectHandler, setAddress, setCoords, reset, setQuery])
 
   const handleClear = useCallback(() => {
     setQuery("")
     setAddress("")
     setCoords("")
     reset()
-    setIsOpen(false)
+    setOpen(false)
   }, [setQuery, setAddress, setCoords, reset])
 
   const handleCopyCoords = useCallback(() => {
@@ -93,9 +114,8 @@ export function LocationField({
   }, [coords])
 
   const inputValue = query !== "" ? query : address
-  const hasValue = inputValue.length > 0
+  const hasValue   = inputValue.length > 0
 
-  // État visuel global du champ
   const fieldState: "active" | "done" | "idle" =
     active ? "active" : done ? "done" : "idle"
 
@@ -103,155 +123,180 @@ export function LocationField({
     <div className="space-y-1.5">
 
       {/* ── Label ── */}
-      <div className="flex items-center justify-between">
-        <Label className={cn(
-          "text-xs font-medium flex items-center gap-1.5 transition-colors",
-          fieldState === "active" && "text-foreground",
-          fieldState === "done" && "text-foreground",
-          fieldState === "idle" && "text-muted-foreground",
-        )}>
-          <MapPin className={cn("w-3 h-3", color)} aria-hidden="true" />
-          {label}
-        </Label>
-      </div>
+      <Label className={cn(
+        "text-xs font-medium flex items-center gap-1.5 transition-colors",
+        fieldState === "idle" ? "text-muted-foreground" : "text-foreground",
+      )}>
+        <MapPin className={cn("w-3 h-3", color)} aria-hidden="true" />
+        {label}
+      </Label>
 
       {/* ── Input row ── */}
       <div className="flex items-start gap-2">
 
-        {/* Input + popover */}
-        <div className="relative flex-1 min-w-0">
-          <Popover open={popoverOpen} onOpenChange={setIsOpen}>
-            <PopoverTrigger asChild>
-              <span className="absolute inset-0 pointer-events-none" aria-hidden="true" />
-            </PopoverTrigger>
+        {/* Input + dropdown — ref sur ce conteneur */}
+        <div ref={containerRef} className="relative flex-1 min-w-0">
 
-            {/* Icône gauche dans l'input */}
-            <div className={cn(
-              "flex items-center h-7 rounded-md border bg-background transition-all overflow-hidden",
-              focused && "ring-2 ring-ring ring-offset-0",
-              fieldState === "done" && !focused && "border-border bg-muted/30",
-              fieldState === "active" && !focused && "border-border bg-muted/20",
-            )}>
-              {/* Icône état à gauche */}
-              <div className={cn(
-                "pl-3 pr-1 flex items-center flex-shrink-0",
-              )}>
-                {loading
-                  ? <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
-                  : fieldState === "done"
-                    ? <MapPin className={cn("w-3.5 h-3.5", color)} />
-                    : fieldState === "active"
-                      ? <Navigation className="w-3.5 h-3.5 text-blue-500 animate-pulse" />
-                      : <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
-                }
-              </div>
-
-              <input
-                value={inputValue}
-                placeholder={placeholder}
-                aria-label={label}
-                aria-expanded={popoverOpen}
-                aria-haspopup="listbox"
-                aria-autocomplete="list"
-                onChange={(e) => handleQueryChange(e.target.value)}
-                onFocus={() => {
-                  setFocused(true)
-                  if (query.length >= MIN_QUERY_LENGTH) setIsOpen(true)
-                }}
-                onBlur={() => {
-                  setFocused(false)
-                  setTimeout(() => setIsOpen(false), 150)
-                }}
-                className={cn(
-                  "flex-1 min-w-0 bg-transparent text-xs py-0 pr-2 outline-none",
-                  "placeholder:text-xs placeholder:text-muted-foreground/80"
-                )}
-              />
-
-              {/* Bouton clear */}
-              {hasValue && (
-                <button
-                  type="button"
-                  onClick={handleClear}
-                  aria-label="Effacer la valeur"
-                  className="pr-2.5 pl-1 flex items-center text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
+          {/* Input */}
+          <div className={cn(
+            "flex items-center h-7 rounded-md border bg-background transition-all overflow-hidden",
+            open && "ring-2 ring-ring ring-offset-0",
+            fieldState === "done" && !open && "border-border bg-muted/30",
+            fieldState === "active" && !open && "border-border bg-muted/20",
+          )}>
+            <div className="pl-3 pr-1 flex items-center shrink-0">
+              {loading
+                ? <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
+                : fieldState === "done"
+                  ? <MapPin className={cn("w-3.5 h-3.5", color)} />
+                  : fieldState === "active"
+                    ? <Navigation className="w-3.5 h-3.5 text-blue-500 animate-pulse" />
+                    : <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+              }
             </div>
 
-            <PopoverContent
-              align="start"
-              side="bottom"
-              sideOffset={6}
-              onOpenAutoFocus={(e) => e.preventDefault()}
-              onInteractOutside={() => setIsOpen(false)}
-              className="p-0 z-[9999] w-[var(--radix-popover-trigger-width)] max-w-[95vw] sm:max-w-[420px] md:max-w-[700px] rounded-xl shadow-lg border"
-            >
-              <Command>
-                <CommandList
-                  role="listbox"
-                  aria-label={`Résultats pour ${label}`}
-                  aria-live="polite"
-                  className="max-h-60 overflow-y-auto"
-                >
-                  {loading && (
-                    <div role="status" aria-label="Recherche en cours"
-                      className="flex items-center gap-2 px-3 py-3 text-xs text-muted-foreground">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />
-                      Recherche en cours…
-                    </div>
-                  )}
+            <input
+              value={inputValue}
+              placeholder={placeholder}
+              aria-label={label}
+              aria-expanded={showDropdown}
+              aria-haspopup="listbox"
+              aria-autocomplete="list"
+              onChange={(e) => handleQueryChange(e.target.value)}
+              onFocus={() => {
+                if (query.length >= MIN_QUERY_LENGTH) setOpen(true)
+              }}
+              className="flex-1 min-w-0 bg-transparent text-xs py-0 pr-2 outline-none placeholder:text-xs placeholder:text-muted-foreground/80"
+            />
 
-                  {!loading && query.length >= MIN_QUERY_LENGTH && results.length === 0 && (
-                    <div role="status" className="px-3 py-5 text-center space-y-1">
-                      <Globe className="w-6 h-6 text-muted-foreground/40 mx-auto" />
-                      <p className="text-sm font-medium">Aucun résultat</p>
-                      <p className="text-xs text-muted-foreground">
-                        Essayez un nom de ville ou un lieu plus précis
-                      </p>
-                    </div>
-                  )}
+            {hasValue && (
+              <button
+                type="button"
+                onClick={handleClear}
+                aria-label="Effacer la saisie"
+                className="pr-2.5 pl-1 flex items-center text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
 
-                  {results.map((item, i) => {
-                    const Icon = getLocationIcon(item.type)
-                    const [main, ...secondary] = item.label.split(",")
-                    return (
-                      <CommandItem
-                        key={`${item.lat}-${item.lng}-${i}`}
-                        value={item.label}
-                        role="option"
-                        onSelect={() => handleSelectResult(item)}
-                        className="flex items-start gap-2.5 cursor-pointer px-3 py-2.5 hover:bg-muted transition-colors"
-                      >
-                        <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Icon className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
-                        </div>
-                        <div className="flex flex-col leading-snug min-w-0">
-                          <span className="text-sm font-medium truncate">{main}</span>
-                          {secondary.length > 0 && (
-                            <span className="text-xs text-muted-foreground truncate">
-                              {secondary.join(",")}
-                            </span>
-                          )}
-                        </div>
-                        {/* Coordonnées en preview à droite */}
-                        <span className="ml-auto text-[10px] font-mono text-muted-foreground flex-shrink-0 self-center">
-                          {formatCoords(item.lat, item.lng)}
-                        </span>
-                      </CommandItem>
-                    )
-                  })}
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+          {/* ── Dropdown ── */}
+          {showDropdown && (
+            <div className="absolute z-[9999] mt-1 w-full bg-popover border border-border rounded-md shadow-lg overflow-hidden">
 
-          {/* Ligne coordonnées sous l'input */}
+              {loading && (
+                <div className="px-3 py-3 flex items-center gap-2.5 text-xs text-muted-foreground">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0 text-emerald-500" />
+                  <div className="flex flex-col gap-0.5">
+                    <span className="font-medium text-foreground">Recherche en cours…</span>
+                    <span className="text-[10px]">Interrogation des services de géolocalisation</span>
+                  </div>
+                </div>
+              )}
+
+              {!loading && results.length === 0 && (
+                <div className="px-3 py-3 flex items-start gap-2.5 text-xs text-muted-foreground">
+                  <MapPin className="w-3.5 h-3.5 shrink-0 mt-px" />
+                  <div className="flex flex-col gap-0.5">
+                    <span className="font-medium text-foreground">Aucun résultat trouvé</span>
+                    <span className="text-[10px]">
+                      Essayez un nom de ville, une adresse postale ou des coordonnées GPS.
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {!loading && results.length > 0 && (
+                <>
+                  <div className="px-3 py-1.5 border-b border-border/60 flex items-center justify-between">
+                    <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
+                      {results.length} résultat{results.length > 1 ? "s" : ""} trouvé{results.length > 1 ? "s" : ""}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground/60">
+                      Cliquez pour sélectionner
+                    </span>
+                  </div>
+
+                  <ul
+                    role="listbox"
+                    aria-label={label}
+                    className="max-h-48 overflow-y-auto divide-y divide-border/40"
+                  >
+                    {results.map((item, i) => {
+                      const Icon = getLocationIcon(item.type)
+                      const typeLabel = getLocationLabel(item.type)
+                      const [main, ...rest] = item.label.split(",")
+
+                      return (
+                        <li key={`${item.lat}-${item.lng}-${i}`} role="option">
+                          <button
+                            type="button"
+                            // mousedown au lieu de click : s'exécute avant que
+                            // l'outside-click listener ne referme le dropdown
+                            onMouseDown={(e) => {
+                              e.preventDefault()
+                              handleSelectResult(item)
+                            }}
+                            className="w-full text-left px-3 py-2 text-xs hover:bg-muted/60 transition-colors flex items-center gap-2.5 group"
+                          >
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="shrink-0 flex items-center justify-center w-6 h-6 rounded-md bg-muted group-hover:bg-background border border-transparent group-hover:border-border/60 transition-all">
+                                  <Icon className="w-3.5 h-3.5 text-muted-foreground group-hover:text-emerald-500 transition-colors" />
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent className="text-xs">
+                                {typeLabel}
+                              </TooltipContent>
+                            </Tooltip>
+
+                            <div className="flex flex-col min-w-0 flex-1">
+                              <span className="truncate font-medium text-foreground leading-tight">
+                                {main}
+                              </span>
+                              {rest.length > 0 ? (
+                                <span className="truncate text-[10px] text-muted-foreground leading-tight mt-px">
+                                  {rest.join(",")}
+                                </span>
+                              ) : (
+                                <span className="text-[10px] text-muted-foreground/50 leading-tight mt-px italic">
+                                  Pas de détail supplémentaire
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="shrink-0 flex flex-col items-end gap-px">
+                              <span className="text-[10px] font-mono text-muted-foreground/70 group-hover:text-muted-foreground transition-colors">
+                                {formatCoords(item.lat, item.lng)}
+                              </span>
+                              <span className="text-[9px] text-muted-foreground/40 group-hover:text-muted-foreground/60 transition-colors">
+                                WGS 84
+                              </span>
+                            </div>
+
+                            <Check className="w-3.5 h-3.5 text-muted-foreground/20 group-hover:text-emerald-500 transition-colors shrink-0" />
+                          </button>
+                        </li>
+                      )
+                    })}
+                  </ul>
+
+                  <div className="px-3 py-1.5 border-t border-border/60 flex items-center gap-1.5">
+                    <Globe className="w-3 h-3 text-muted-foreground/50 shrink-0" />
+                    <span className="text-[10px] text-muted-foreground/50">
+                      Source : OpenStreetMap Nominatim
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* ── Coordonnées sous l'input ── */}
           {coords && query === "" && (
             <div className="mt-1 flex items-center gap-1 px-1">
-              <LocateFixed className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+              <LocateFixed className="w-3 h-3 text-muted-foreground shrink-0" />
               <span className="text-[10px] font-mono text-muted-foreground select-all flex-1 truncate">
                 {coords}
               </span>
@@ -260,8 +305,8 @@ export function LocationField({
                   <button
                     type="button"
                     onClick={handleCopyCoords}
-                    aria-label={copied ? "Coordonnées copiées" : "Copier les coordonnées"}
-                    className="p-0.5 rounded hover:bg-muted transition-colors flex-shrink-0"
+                    aria-label={copied ? "Coordonnées copiées dans le presse-papier" : "Copier les coordonnées GPS"}
+                    className="p-0.5 rounded hover:bg-muted transition-colors shrink-0"
                   >
                     {copied
                       ? <CheckCheck className="w-3 h-3 text-emerald-500" />
@@ -270,7 +315,10 @@ export function LocationField({
                   </button>
                 </TooltipTrigger>
                 <TooltipContent className="text-xs">
-                  {copied ? "Copié !" : "Copier les coordonnées"}
+                  {copied
+                    ? "✓ Coordonnées copiées dans le presse-papier"
+                    : "Copier les coordonnées GPS (format décimal WGS 84)"
+                  }
                 </TooltipContent>
               </Tooltip>
             </div>
@@ -285,21 +333,26 @@ export function LocationField({
               size="sm"
               variant={active ? "default" : done ? "outline" : "secondary"}
               aria-pressed={active}
-              aria-label={`${done ? "Modifier" : buttonLabel} sur la carte`}
+              aria-label={`${done ? "Modifier l'emplacement" : buttonLabel} sur la carte`}
               onClick={onClick}
               className="shrink-0 text-xs h-7 w-24 self-start rounded-md gap-1.5 transition-all"
             >
               {active
-                ? <Navigation className="w-3.5 h-3.5" aria-hidden="true" />
+                ? <Navigation className="w-3.5 h-3.5" />
                 : done
-                  ? <Check className="w-3.5 h-3.5" aria-hidden="true" />
-                  : <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
+                  ? <Check className="w-3.5 h-3.5" />
+                  : <MapPin className="w-3.5 h-3.5" />
               }
               {active ? "En cours…" : done ? "Modifier" : buttonLabel}
             </Button>
           </TooltipTrigger>
-          <TooltipContent className="text-xs max-w-[200px] text-center">
-            {tooltip}
+          <TooltipContent className="text-xs max-w-[220px] text-center leading-relaxed">
+            {active
+              ? "Cliquez sur n'importe quel point de la carte pour définir l'emplacement exact."
+              : done
+                ? "L'emplacement est enregistré. Cliquez pour le repositionner sur la carte."
+                : tooltip
+            }
           </TooltipContent>
         </Tooltip>
 
@@ -308,27 +361,23 @@ export function LocationField({
       {/* ── Message contextuel ── */}
       {fieldState === "idle" && (
         <p className="flex items-start gap-1.5 text-[11px] text-muted-foreground leading-relaxed">
-          <MousePointerClick className="w-3 h-3 flex-shrink-0 mt-px" />
-          Recherchez une adresse précise (ville, quartier, rue, point d’intérêt) pour gagner du temps,
-          ou activez la sélection sur la carte pour positionner manuellement l’emplacement exact.
-          Vous pouvez combiner les deux méthodes à tout moment.
+          <MousePointerClick className="w-3 h-3 shrink-0 mt-px" />
+          Saisissez une adresse dans le champ ci-dessus, ou activez la sélection sur la carte pour pointer directement un emplacement.
         </p>
       )}
       {fieldState === "active" && (
         <p className="flex items-start gap-1.5 text-[11px] text-muted-foreground leading-relaxed">
-          <LocateFixed className="w-3 h-3 flex-shrink-0 mt-px animate-pulse" />
-          Mode sélection activé — cliquez sur la carte pour définir précisément votre position.
-          Les coordonnées GPS seront automatiquement récupérées et converties en adresse.
-          Vous pouvez également continuer à affiner votre recherche dans le champ.
+          <LocateFixed className="w-3 h-3 shrink-0 mt-px animate-pulse text-blue-500" />
+          Mode sélection carte activé — cliquez sur la carte pour positionner le point. Les coordonnées seront capturées automatiquement.
         </p>
       )}
       {fieldState === "done" && (
         <p className="flex items-start gap-1.5 text-[11px] text-muted-foreground leading-relaxed">
-          <ArrowRight className="w-3 h-3 flex-shrink-0 mt-px" />
-          Emplacement enregistré avec succès. Vous pouvez le modifier à tout moment en cliquant sur
-          « Modifier », en sélectionnant un nouveau point sur la carte ou en saisissant une autre adresse.
+          <ArrowRight className="w-3 h-3 shrink-0 mt-px text-emerald-500" />
+          Emplacement enregistré avec succès. Cliquez sur « Modifier » pour repositionner le point ou effectuer une nouvelle recherche.
         </p>
       )}
+
     </div>
   )
 }

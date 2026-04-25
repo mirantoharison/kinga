@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, useCallback } from "react"
 import { calculateRidePrice } from "@/lib/ridePricing"
 import { getDefaultDateTime } from "@/lib/dateUtils"
 import { reverseGeocode, searchLocation } from "@/lib/geocoding"
@@ -30,7 +30,7 @@ type RideForm = {
   description: string
 }
 
-type Stop = {
+export type Stop = {
   label: string
   lat: number
   lng: number
@@ -41,21 +41,18 @@ type Stop = {
 export function useCreateRide() {
   const [activeTab, setActiveTab] = useState<TabKey>("route")
   const [selecting, setSelecting] = useState<"from" | "to" | null>(null)
-  const [routeInfo, setRouteInfo] = useState<RouteInfo>({
-    distance: 0,
-    duration: 0,
-  })
+  const [routeInfo, setRouteInfo] = useState<RouteInfo>({ distance: 0, duration: 0 })
 
   const [stops, setStops] = useState<Stop[]>([])
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<Stop[]>([])
-  const [loading, setLoading] = useState(false)
+  const [searchLoading, setSearchLoading] = useState(false)
 
   const defaults = getDefaultDateTime()
 
   const [form, setForm] = useState<RideForm>({
     from: { label: "", lat: null, lng: null },
-    to: { label: "", lat: null, lng: null },
+    to:   { label: "", lat: null, lng: null },
     date: defaults.date,
     time: defaults.time,
     price: "",
@@ -65,20 +62,17 @@ export function useCreateRide() {
 
   /* ─── HELPERS ─── */
 
-  const setField = <K extends keyof RideForm>(
-    key: K,
-    value: RideForm[K]
-  ) => {
+  const setField = useCallback(<K extends keyof RideForm>(key: K, value: RideForm[K]) => {
     setForm(prev => ({ ...prev, [key]: value }))
-  }
+  }, [])
 
-  const setLocation = (field: "from" | "to", value: LatLng) => {
+  const setLocation = useCallback((field: "from" | "to", value: LatLng) => {
     setForm(prev => ({ ...prev, [field]: value }))
-  }
+  }, [])
 
-  /* ─── HANDLERS ─── */
+  /* ─── LOCATION ─── */
 
-  const applyLocation = async (
+  const applyLocation = useCallback(async (
     lat: number,
     lng: number,
     initialLabel?: string,
@@ -88,93 +82,115 @@ export function useCreateRide() {
     if (!currentSelecting) return
 
     const coordsText = `${lat.toFixed(5)}, ${lng.toFixed(5)}`
-    const fallbackLabel = initialLabel || coordsText
 
+    // Applique immédiatement avec le label disponible
     setLocation(currentSelecting, {
-      label: fallbackLabel,
+      label: initialLabel ?? coordsText,
       lat,
       lng,
     })
-
     setSelecting(null)
 
-    if (initialLabel) return
+    // Si pas de label fourni, on reverse geocode en arrière-plan
+    if (!initialLabel) {
+      try {
+        const labelName = await reverseGeocode(lat, lng)
+        setLocation(currentSelecting, {
+          label: `${labelName} • ${coordsText}`,
+          lat,
+          lng,
+        })
+      } catch {}
+    }
+  }, [selecting, setLocation])
 
-    try {
-      const labelName = await reverseGeocode(lat, lng)
-
-      setLocation(currentSelecting, {
-        label: `${labelName} • ${coordsText}`,
-        lat,
-        lng,
-      })
-    } catch {}
-  }
-
-  const handleMapSelect = (lat: number, lng: number) =>
+  const handleMapSelect = useCallback((lat: number, lng: number) => {
     applyLocation(lat, lng)
+  }, [applyLocation])
 
-  const handleSearchSelect = (
+  const handleSearchSelect = useCallback((
     field: "from" | "to",
     lat: number,
     lng: number,
     label: string
-  ) => applyLocation(lat, lng, label, field)
+  ) => {
+    applyLocation(lat, lng, label, field)
+  }, [applyLocation])
 
-  const handleAddStop = (item: Stop) => {
+  /* ─── STOPS ─── */
+
+  const handleAddStop = useCallback((item: Stop) => {
     setStops(prev => [...prev, item])
     setQuery("")
     setResults([])
-  }
+  }, [])
 
-  const handleRemoveStop = (index: number) => {
+  const handleRemoveStop = useCallback((index: number) => {
     setStops(prev => prev.filter((_, i) => i !== index))
-  }
+  }, [])
 
-  const resetPoints = () => {
+  const handleReorderStops = useCallback((fromIndex: number, toIndex: number) => {
+    setStops(prev => {
+      const next = [...prev]
+      const [moved] = next.splice(fromIndex, 1)
+      next.splice(toIndex, 0, moved)
+      return next
+    })
+  }, [])
+
+  const handleUpdateStop = useCallback((index: number, updated: Partial<Stop>) => {
+    setStops(prev =>
+      prev.map((s, i) => (i === index ? { ...s, ...updated } : s))
+    )
+  }, [])
+
+  /* ─── RESET ─── */
+
+  const resetPoints = useCallback(() => {
     setForm(prev => ({
       ...prev,
       from: { label: "", lat: null, lng: null },
-      to: { label: "", lat: null, lng: null },
+      to:   { label: "", lat: null, lng: null },
     }))
+    setStops([])                              // ← stops aussi réinitialisés
     setRouteInfo({ distance: 0, duration: 0 })
-  }
+  }, [])
 
   /* ─── DERIVED ─── */
 
-  const fromCoords: LatLngTuple | null = useMemo(() => {
-    if (form.from.lat !== null && form.from.lng !== null) {
+  const fromCoords = useMemo((): LatLngTuple | null => {
+    if (form.from.lat !== null && form.from.lng !== null)
       return [form.from.lat, form.from.lng]
-    }
     return null
   }, [form.from])
 
-  const toCoords: LatLngTuple | null = useMemo(() => {
-    if (form.to.lat !== null && form.to.lng !== null) {
+  const toCoords = useMemo((): LatLngTuple | null => {
+    if (form.to.lat !== null && form.to.lng !== null)
       return [form.to.lat, form.to.lng]
-    }
     return null
   }, [form.to])
+
+  // Stops convertis en LatLngTuple[] pour RoutePreview
+  const stopCoords = useMemo((): Stop[] => stops, [stops])
 
   const isRouteDefined = !!(fromCoords && toCoords)
 
   const seatsNumber = useMemo(() => Number(form.seats), [form.seats])
 
-  const estimatedPrice = useMemo(() => {
-    return calculateRidePrice(routeInfo.distance, seatsNumber)
-  }, [routeInfo.distance, seatsNumber])
+  const estimatedPrice = useMemo(
+    () => calculateRidePrice(routeInfo.distance, seatsNumber),
+    [routeInfo.distance, seatsNumber]
+  )
 
-  const canSubmit = useMemo(() => {
-    return (
-      isRouteDefined &&
-      form.date &&
-      form.time &&
-      form.price &&
-      form.seats
-    )
-  }, [form, isRouteDefined])
+  const canSubmit = useMemo(() => (
+    isRouteDefined &&
+    !!form.date &&
+    !!form.time &&
+    !!form.price &&
+    !!form.seats
+  ), [form, isRouteDefined])
 
-  /* ─── SEARCH ─── */
+  /* ─── SEARCH (stops) ─── */
 
   useEffect(() => {
     if (query.length < 3) {
@@ -183,22 +199,21 @@ export function useCreateRide() {
     }
 
     const timeout = setTimeout(async () => {
+      setSearchLoading(true)
       try {
-        setLoading(true)
         const res = await searchLocation(query)
-
-        // sécurisation du typage
         setResults(
-          res.map((item: any) => ({
+          res.map((item: any): Stop => ({
             label: item.label,
-            lat: item.lat,
-            lng: item.lng,
+            lat:   item.lat,
+            lng:   item.lng,
           }))
         )
       } catch (e) {
-        console.error(e)
+        console.error("[useCreateRide] search error:", e)
+        setResults([])
       } finally {
-        setLoading(false)
+        setSearchLoading(false)
       }
     }, 400)
 
@@ -213,9 +228,10 @@ export function useCreateRide() {
     selecting,
     routeInfo,
     stops,
+    stopCoords,
     query,
     results,
-    loading,
+    searchLoading,
     form,
 
     // setters
@@ -234,6 +250,8 @@ export function useCreateRide() {
     handleSearchSelect,
     handleAddStop,
     handleRemoveStop,
+    handleReorderStops,
+    handleUpdateStop,
     resetPoints,
 
     // derived

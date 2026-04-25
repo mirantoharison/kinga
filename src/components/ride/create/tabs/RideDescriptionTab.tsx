@@ -50,9 +50,15 @@ export function DescriptionTab({ description, setField }: Props) {
       {!description && (
         <div className="rounded-md border border-border bg-muted/50 p-3">
           <p className="text-[11px] text-muted-foreground leading-relaxed">
-            Vous pouvez utiliser cet espace pour préciser les éléments importants de votre trajet :
-            horaires, flexibilité, bagages, urgence ou préférences pendant le trajet.
-            Cela améliore la compréhension et augmente vos chances de trouver un conducteur.
+            Vous pouvez utiliser cet espace pour donner plus de contexte à votre trajet et éviter toute ambiguïté.
+            Par exemple, vous pouvez préciser si votre départ est flexible ou dépend d’un horaire précis,
+            indiquer si vous transportez des bagages ou du matériel particulier, ou encore mentionner
+            le niveau d’urgence de votre déplacement.
+          </p>
+
+          <p className="text-[11px] text-muted-foreground leading-relaxed mt-2">
+            Ces informations ne sont pas obligatoires, mais elles permettent aux conducteurs de mieux comprendre votre demande
+            et d’augmenter vos chances de recevoir rapidement une proposition adaptée.
           </p>
         </div>
       )}
@@ -86,7 +92,8 @@ export function DescriptionTab({ description, setField }: Props) {
       {/* FOOTER */}
       {description && (
         <p className="text-[11px] text-muted-foreground leading-relaxed border-t border-border pt-3">
-          Une description détaillée aide les conducteurs à mieux évaluer votre demande.
+          Une description claire et détaillée permet aux conducteurs d’évaluer plus facilement votre demande,
+          de mieux anticiper les conditions du trajet et d’y répondre de manière plus pertinente.
         </p>
       )}
 
