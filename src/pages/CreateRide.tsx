@@ -439,7 +439,7 @@ export default function CreateRidePage() {
 
               {/* TAB 3 — DESCRIPTION */}
               {activeTab === "description" && (
-                <div className="space-y-6 border border-border rounded-md p-4 bg-card/80">
+                <div className="space-y-6 border border-border rounded-lg p-5 bg-card">
 
                   {/* HEADER */}
                   <TabHeader
@@ -450,8 +450,8 @@ export default function CreateRidePage() {
 
                   {/* EMPTY STATE GUIDE */}
                   {!form.description && (
-                    <div className="rounded-md border border-zinc-800 bg-zinc-900/30 p-3">
-                      <p className="text-[11px] text-zinc-500 leading-relaxed">
+                    <div className="rounded-md border border-border bg-muted/50 p-3">
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">
                         Vous pouvez utiliser cet espace pour préciser les éléments importants de votre trajet et aider les conducteurs à mieux comprendre votre besoin.
                         Par exemple, vous pouvez indiquer si votre départ est flexible ou contraint par un horaire précis, préciser si vous voyagez avec des bagages ou du matériel particulier, mentionner si votre déplacement est urgent ou planifié à l’avance, ou encore donner des indications sur vos préférences pendant le trajet.
                         Ces informations ne sont pas obligatoires, mais elles permettent de rendre votre demande plus claire, d’éviter les malentendus et d’augmenter vos chances de recevoir rapidement une proposition adaptée.
@@ -480,9 +480,14 @@ export default function CreateRidePage() {
                               : label
                           )
                         }
-                        className="flex items-center gap-1.5 text-[10px] px-2 py-1 rounded-full border border-zinc-700 text-zinc-400 hover:bg-zinc-800 transition"
+                        className="
+            flex items-center gap-1.5 text-[10px] px-2 py-1 rounded-full
+            border border-border
+            text-muted-foreground
+            hover:bg-muted transition
+          "
                       >
-                        <Icon className="w-3 h-3 text-zinc-500" />
+                        <Icon className="w-3 h-3 text-muted-foreground" />
                         {label}
                       </button>
                     ))}
@@ -496,7 +501,7 @@ export default function CreateRidePage() {
 
                   {/* FOOTER INFO */}
                   {form.description && (
-                    <p className="text-[11px] text-zinc-500 leading-relaxed border-t border-zinc-800 pt-3">
+                    <p className="text-[11px] text-muted-foreground leading-relaxed border-t border-border pt-3">
                       Une description détaillée aide les conducteurs à mieux évaluer votre demande et à proposer un trajet correspondant à vos besoins.
                     </p>
                   )}
@@ -506,40 +511,41 @@ export default function CreateRidePage() {
 
               {/* TAB 4 — FICHIERS */}
               {activeTab === "files" && (
-                <div className="space-y-6 border border-border rounded-md p-4 bg-card/80">
+                <div className="space-y-6 border border-border rounded-lg p-5 bg-card">
 
                   {/* HEADER */}
                   <div className="space-y-2">
-                    <p className="text-xs font-medium text-zinc-300 flex items-center gap-1.5">
-                      <Paperclip className="w-3.5 h-3.5 text-zinc-400" />
+                    <p className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                      <Paperclip className="w-3.5 h-3.5 text-muted-foreground" />
                       Fichiers et informations complémentaires
                     </p>
-                    <p className="text-[11px] text-zinc-500 leading-relaxed">
-                      Vous pouvez ajouter des fichiers pour apporter des précisions à votre demande.
-                      Par exemple, une photo de bagage volumineux, un document utile ou toute information
-                      permettant au conducteur de mieux anticiper les conditions du trajet.
+
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      Vous pouvez ajouter des fichiers pour apporter des précisions concrètes à votre demande et aider les conducteurs à mieux comprendre votre situation.
+                      Par exemple, vous pouvez partager une photo du lieu de prise en charge pour faciliter le rendez-vous, montrer le volume réel de vos bagages,
+                      ou encore fournir toute information visuelle utile permettant d’anticiper les conditions du trajet.
                     </p>
                   </div>
 
                   {/* UPLOAD ZONE */}
                   <div className="space-y-3">
-                    <label className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-zinc-700 rounded-xl p-8 text-center cursor-pointer hover:border-zinc-600 hover:bg-zinc-800/30 transition-all group">
+                    <label className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-border rounded-xl p-8 text-center cursor-pointer hover:bg-muted transition-all group">
 
-                      <div className="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center group-hover:border-zinc-600 transition-colors">
-                        <Upload className="w-4 h-4 text-zinc-500" />
+                      <div className="w-10 h-10 rounded-xl bg-muted border border-border flex items-center justify-center transition-colors">
+                        <Upload className="w-4 h-4 text-muted-foreground" />
                       </div>
 
                       <div>
-                        <p className="text-sm font-medium text-zinc-300">
+                        <p className="text-sm font-medium text-foreground">
                           Glissez-déposez vos fichiers
                         </p>
-                        <p className="text-xs text-zinc-600 mt-0.5">
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           ou cliquez pour importer
                         </p>
                       </div>
 
-                      <p className="text-[10px] text-zinc-600">
-                        Images (JPEG, PNG) ou documents (PDF) · 5 Mo max
+                      <p className="text-[10px] text-muted-foreground">
+                        Images (JPEG, PNG) ou documents (PDF) · 5 Mo max par fichier
                       </p>
 
                       <input type="file" className="hidden" multiple />
@@ -547,14 +553,15 @@ export default function CreateRidePage() {
                   </div>
 
                   {/* EMPTY STATE INFO */}
-                  <div className="text-[11px] text-zinc-500 leading-relaxed border border-zinc-800 bg-zinc-900/30 rounded-md p-3">
-                    L’ajout de fichiers est facultatif, mais peut aider les conducteurs à mieux comprendre votre besoin
-                    et à éviter certaines contraintes liées au trajet, notamment en cas de bagages particuliers ou de demandes spécifiques.
+                  <div className="text-[11px] text-muted-foreground leading-relaxed border border-border bg-muted/50 rounded-md p-3">
+                    L’ajout de fichiers est facultatif, mais il peut grandement améliorer la compréhension de votre demande.
+                    Des éléments visuels simples, comme une photo du point de rendez-vous ou de vos bagages, permettent aux conducteurs
+                    d’anticiper plus facilement l’organisation du trajet et d’éviter toute incompréhension.
                   </div>
 
                   {/* SECURITY NOTE */}
-                  <div className="flex items-start gap-1.5 text-[11px] text-zinc-500 border-t border-zinc-800 pt-3">
-                    <Info className="w-3 h-3 mt-[2px] text-zinc-500 flex-shrink-0" />
+                  <div className="flex items-start gap-1.5 text-[11px] text-muted-foreground border-t border-border pt-3">
+                    <Info className="w-3 h-3 mt-[2px] text-muted-foreground flex-shrink-0" />
                     Évitez de partager des informations sensibles ou personnelles. Les fichiers sont uniquement visibles par les conducteurs intéressés par votre demande.
                   </div>
 
