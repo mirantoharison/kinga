@@ -27,7 +27,7 @@ export default function CreateRidePage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="p-6 max-w-3xl mx-auto space-y-6">
+      <div className="p-6 max-w-4xl mx-auto space-y-6">
 
         {/* ── HEADER ── */}
         <div className="flex items-start gap-4 p-5 rounded-2xl bg-card border border-border">
@@ -122,9 +122,10 @@ export default function CreateRidePage() {
               query={ride.query}
               setQuery={ride.setQuery}
               results={ride.results}
+              searchLoading={ride.searchLoading}
               handleAddStop={ride.handleAddStop}
               handleRemoveStop={ride.handleRemoveStop}
-              handleRemoveStop={ride.handleReorderStops}
+              handleReorderStops={ride.handleReorderStops}
               routeInfo={ride.routeInfo}
             />
           )}

@@ -179,9 +179,11 @@ export function DetailsTab({
                 className="group flex items-center justify-between rounded-md border border-border bg-muted/50 px-3 py-2 transition hover:bg-muted cursor-grab active:cursor-grabbing"
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  {/* Poignée de drag */}
                   <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-muted-foreground shrink-0 transition-colors" />
                   <Globe className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                  <span className="shrink-0 flex items-center justify-center w-4 h-4 rounded-full bg-blue-500/10 text-blue-500 text-[9px] font-semibold leading-none">
+                    {i + 1}
+                  </span>
                   <span className="text-xs text-foreground truncate">
                     {stop.label}
                   </span>
@@ -222,8 +224,8 @@ export function DetailsTab({
               fromCoords={[form.from.lat, form.from.lng]}
               toCoords={[form.to.lat, form.to.lng]}
               stops={stops}
-              onSelect={() => {}}
-              setRouteInfo={() => {}}
+              onSelect={() => { }}
+              setRouteInfo={() => { }}
             />
           </div>
         )}
