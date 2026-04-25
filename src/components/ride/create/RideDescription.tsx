@@ -13,6 +13,8 @@ export function RideDescription({ description, onChange }: Props) {
 
       <Textarea
         placeholder="Ex : Voiture climatisée, musique douce, une pause café prévue à mi-chemin. Bagages acceptés. Non-fumeur."
+        className="text-xs"
+        autoCorrect="off"
         value={description}
         onChange={(e) => onChange(e.target.value)}
         rows={3}
