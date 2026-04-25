@@ -569,7 +569,7 @@ export default function CreateRidePage() {
               )}
 
               {/* Séparateur + actions */}
-              <div className="pt-2 border-t border-zinc-800">
+              <div className="pt-4 border-t border-border">
                 <RideActions
                   canSubmit={!!canSubmit}
                   onSubmit={() => console.log("submit", form)}
