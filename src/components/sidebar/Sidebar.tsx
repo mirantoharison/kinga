@@ -1,7 +1,7 @@
 
 "use client"
 
-import { Sidebar } from "@/components/ui/sidebar"
+import { Sidebar, SidebarFooter } from "@/components/ui/sidebar"
 import { SidebarHeader } from "./SidebarHeader"
 import { SidebarContentBlock } from "./SidebarContent"
 

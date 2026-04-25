@@ -16,15 +16,31 @@ import { useEffect, useState } from "react"
 import { useTheme } from "@/hooks/use-theme"
 import { useLocation, matchPath } from "react-router-dom"
 
+const languages = [
+  { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "mg", label: "Malagasy", flag: "🇲🇬" },
+  { code: "ar", label: "العربية", flag: "🇸🇦" },
+  { code: "zh", label: "中文", flag: "🇨🇳" },
+  { code: "es", label: "Español", flag: "🇪🇸" },
+  { code: "pt", label: "Português", flag: "🇧🇷" },
+  { code: "de", label: "Deutsch", flag: "🇩🇪" },
+]
+
+
 export function Header() {
   const { theme, toggle } = useTheme()
   const [lang, setLang] = useState("fr")
   const location = useLocation()
+  const currentLang = languages.find((l) => l.code === lang) ?? languages[0]
 
   const routeTitles: Record<string, string> = {
     "/": "Accueil",
     "/ride/search": "Rechercher un trajet",
     "/ride/create": "Proposer un trajet",
+    "/ride/history": "Historique des trajets",
+    "/ride/archived": "Trajets archivés",
+    "/ride/details/:rideId": "Détails du trajet",
     "/rides": "Mes trajets",
     "/messages": "Messages",
     "/messages/archived": "Messages archivés",
@@ -33,6 +49,8 @@ export function Header() {
     "/reviews": "Évaluations",
     "/payments": "Paiements",
     "/settings": "Paramètres",
+    "/profile": "Mon profil",
+    "/profile/:profileId": "Profil utilisateur",
   }
 
   useEffect(() => {
@@ -75,22 +93,28 @@ export function Header() {
           {/* 🌍 Language */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Globe className="w-4 h-4" />
+              <Button variant="ghost" size="sm" className="gap-2 px-2 h-8">
+                <span className="text-base leading-none">{currentLang.flag}</span>
+                <span className="text-xs font-medium uppercase">{currentLang.code}</span>
               </Button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Langue</DropdownMenuLabel>
               <DropdownMenuSeparator />
-
-              <DropdownMenuItem onClick={() => changeLang("fr")}>
-                🇫🇷 Français
-              </DropdownMenuItem>
-
-              <DropdownMenuItem onClick={() => changeLang("en")}>
-                🇬🇧 English
-              </DropdownMenuItem>
+              {languages.map((l) => (
+                <DropdownMenuItem
+                  key={l.code}
+                  onClick={() => changeLang(l.code)}
+                  className="gap-2"
+                >
+                  <span className="text-base leading-none">{l.flag}</span>
+                  <span className="text-xs font-medium flex-1">{l.label}</span>
+                  {lang === l.code && (
+                    <span className="text-[10px] text-muted-foreground">✓</span>
+                  )}
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
 

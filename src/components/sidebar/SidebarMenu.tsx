@@ -22,6 +22,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  useSidebar,
 } from "@/components/ui/sidebar"
 
 import { useNavigate, useLocation } from "react-router-dom"
@@ -68,9 +69,16 @@ const menus = [
   },
 ]
 
+
 export function SidebarMenus() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { isMobile, setOpenMobile } = useSidebar()
+
+  const handleNavigate = (path: string) => {
+    navigate(path)
+    if (isMobile) setOpenMobile(false)
+  }
 
   return (
     <>
@@ -85,7 +93,7 @@ export function SidebarMenus() {
               return (
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton
-                    onClick={() => navigate(item.path)}
+                    onClick={() => handleNavigate(item.path)}
                     className={isActive ? "bg-muted font-medium" : ""}
                   >
                     <item.icon className="w-4 h-4" />
